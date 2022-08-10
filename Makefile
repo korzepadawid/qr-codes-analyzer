@@ -6,3 +6,6 @@ migrate-up:
 
 migrate-down:
 	migrate -path db/migrations/ -database postgresql://postgres:postgres@localhost:5432/qr-codes?sslmode=disable -verbose down
+
+sqlc:
+	sqlc generate
