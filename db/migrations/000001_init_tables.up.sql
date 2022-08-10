@@ -21,6 +21,7 @@ CREATE TABLE "qr_codes"
     "id"              bigserial PRIMARY KEY NOT NULL,
     "owner"           varchar               NOT NULL,
     "group_id"        bigint                NOT NULL,
+    "usages_count"    bigint                NOT NULL DEFAULT 0,
     "redirection_url" varchar               NOT NULL,
     "title"           varchar               NOT NULL,
     "description"     varchar               NOT NULL default '',
