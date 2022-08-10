@@ -1,4 +1,4 @@
-name: Go
+name: ci-test
 
 on:
   push:
@@ -7,19 +7,44 @@ on:
     branches: [ "master" ]
 
 jobs:
-
-  build:
+  test:
+    name: Test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14.4-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: qr-codes
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.18
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Install go-migrate
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-386.tar.gz | tar xvz
+          sudo mv migrate /usr/bin/
+          migrate -version
 
-    - name: Build
-      run: go build -v ./...
+      - name: Env setup
+        run: |
+          echo DB_DRIVER=postgres >> app.env
+          echo DB_SOURCE=postgresql://postgres:postgres@localhost:5432/bank?sslmode=disable >> app.env
 
-    - name: Test
-      run: go test -v ./...
+      - name: Migrate up
+        run: make migrate-up
+
+      - name: Test
+        run: make test
