@@ -41,7 +41,7 @@ jobs:
       - name: Env setup
         run: |
           echo DB_DRIVER=postgres >> app.env
-          echo DB_SOURCE=postgresql://postgres:postgres@localhost:5432/bank?sslmode=disable >> app.env
+          echo DB_SOURCE=postgresql://postgres:postgres@localhost:5432/qr-codes?sslmode=disable >> app.env
 
       - name: Migrate up
         run: make migrate-up
