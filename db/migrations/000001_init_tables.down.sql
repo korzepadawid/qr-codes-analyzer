@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS "redirects";
+DROP TABLE IF EXISTS "qr_codes";
+DROP TABLE IF EXISTS "groups";
+DROP TABLE IF EXISTS "users";
