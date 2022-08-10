@@ -22,4 +22,7 @@ go.work
 
 # ide
 .vscode
-.idea
+.idea/
+
+# env
+*.env
