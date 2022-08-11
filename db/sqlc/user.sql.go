@@ -40,15 +40,60 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const getUser = `-- name: GetUser :one
+const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT username, email, full_name, password, created_at
 FROM users
-WHERE username = $1
+WHERE LOWER(email) = LOWER($1)
 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUser, username)
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.Username,
+		&i.Email,
+		&i.FullName,
+		&i.Password,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT username, email, full_name, password, created_at
+FROM users
+WHERE LOWER(username) = LOWER($1)
+LIMIT 1
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
+	var i User
+	err := row.Scan(
+		&i.Username,
+		&i.Email,
+		&i.FullName,
+		&i.Password,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getUserByUsernameOrEmail = `-- name: GetUserByUsernameOrEmail :one
+SELECT username, email, full_name, password, created_at
+FROM users
+WHERE LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($2)
+LIMIT 1
+`
+
+type GetUserByUsernameOrEmailParams struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+func (q *Queries) GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUsernameOrEmailParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsernameOrEmail, arg.Username, arg.Email)
 	var i User
 	err := row.Scan(
 		&i.Username,

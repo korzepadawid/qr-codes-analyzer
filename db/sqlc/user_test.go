@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
+	"testing"
+
 	"github.com/korzepadawid/qr-codes-analyzer/util"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func createRandomUser(t *testing.T) User {
@@ -35,7 +36,7 @@ func TestCreateUser(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	user := createRandomUser(t)
 
-	u, err := testQueries.GetUser(context.Background(), user.Username)
+	u, err := testQueries.GetUserByUsername(context.Background(), user.Username)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, user)

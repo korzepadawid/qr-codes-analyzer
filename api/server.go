@@ -19,8 +19,8 @@ func NewServer(config config.Config, store db.Store) (*Server, error) {
 		router: gin.Default(),
 	}
 
-	server.router.POST("/signup", server.signUp)
-	server.router.POST("/signin", server.signIn)
+	server.router.POST("/auth/signup", server.signUp)
+	server.router.POST("/auth/signin", server.signIn)
 
 	return &server, nil
 }
