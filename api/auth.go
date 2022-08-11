@@ -6,6 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type signUpRequest struct {
+	username string `json:"username"`
+	email    string `json:"email"`
+	fullName string `json:"full_name"`
+	password string `json:"password"`
+}
+
 func (s *Server) signUp(ctx *gin.Context) {
 	ctx.JSON(http.StatusTeapot, gin.H{"ok": "ok"})
 }
