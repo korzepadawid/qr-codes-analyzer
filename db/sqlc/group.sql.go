@@ -38,6 +38,7 @@ const getGroupsByOwner = `-- name: GetGroupsByOwner :many
 SELECT g.id, g.owner, g.title, g.description, g.created_at
 FROM users u
          JOIN groups g on u.username = g.owner AND u.username = $3
+ORDER BY g.created_at DESC
 LIMIT $1 OFFSET $2
 `
 

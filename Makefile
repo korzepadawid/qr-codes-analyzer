@@ -12,3 +12,6 @@ sqlc:
 
 test:
 	go test -v -cover ./...
+
+mockstore:
+	mockgen --build_flags=--mod=mod -package mockdb -destination db/mock/store.go github.com/korzepadawid/qr-codes-analyzer/db/sqlc Store
