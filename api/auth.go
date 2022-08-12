@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 	"strings"
 	"time"
@@ -38,6 +39,13 @@ func (s *Server) signUp(ctx *gin.Context) {
 	}
 
 	_, err := s.store.GetUserByUsernameOrEmail(ctx, gArg)
+
+	if err != nil {
+		if err != sql.ErrNoRows {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(ErrInternalError))
+			return
+		}
+	}
 
 	if err == nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(ErrUserAlreadyExists))
