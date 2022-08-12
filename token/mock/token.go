@@ -6,6 +6,7 @@ package mocktoken
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	token "github.com/korzepadawid/qr-codes-analyzer/token"
 	reflect "reflect"
 )
 
@@ -48,11 +49,12 @@ func (mr *MockTokenizerMockRecorder) CreateToken(arg0 interface{}) *gomock.Call 
 }
 
 // VerifyToken mocks base method
-func (m *MockTokenizer) VerifyToken(arg0 string) error {
+func (m *MockTokenizer) VerifyToken(arg0 string) (token.Payload, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "VerifyToken", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(token.Payload)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // VerifyToken indicates an expected call of VerifyToken
