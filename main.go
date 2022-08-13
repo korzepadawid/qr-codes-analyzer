@@ -31,5 +31,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server.Run()
+	err = server.Run()
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }

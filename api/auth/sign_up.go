@@ -1,4 +1,4 @@
-package api
+package auth
 
 import (
 	"database/sql"
@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/korzepadawid/qr-codes-analyzer/api/errors"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
-	"github.com/korzepadawid/qr-codes-analyzer/util"
 )
 
 type signUpRequest struct {
@@ -25,11 +25,11 @@ type userResponse struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
-func (s *Server) signUp(ctx *gin.Context) {
+func (h *authHandler) signUp(ctx *gin.Context) {
 	var request signUpRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.Error(err)
 		return
 	}
 
@@ -38,24 +38,24 @@ func (s *Server) signUp(ctx *gin.Context) {
 		Email:    strings.ToLower(request.Email),
 	}
 
-	_, err := s.store.GetUserByUsernameOrEmail(ctx, gArg)
+	_, err := h.store.GetUserByUsernameOrEmail(ctx, gArg)
 
 	if err != nil {
 		if err != sql.ErrNoRows {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(ErrInternalError))
+			ctx.Error(err)
 			return
 		}
 	}
 
 	if err == nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(ErrUserAlreadyExists))
+		ctx.Error(errors.ErrUserAlreadyExists)
 		return
 	}
 
-	hashedPassword, err := util.HashPassword(request.Password)
+	hashedPassword, err := h.passwordService.HashPassword(request.Password)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.Error(err)
 		return
 	}
 
@@ -66,16 +66,20 @@ func (s *Server) signUp(ctx *gin.Context) {
 		FullName: request.FullName,
 	}
 
-	user, err := s.store.CreateUser(ctx, cArg)
+	user, err := h.store.CreateUser(ctx, cArg)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.Error(err)
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, mapUserToResponse(user))
 }
 
-func (s *Server) signIn(ctx *gin.Context) {
-	ctx.JSON(http.StatusTeapot, gin.H{"ok": "ok"})
+func mapUserToResponse(user db.User) userResponse {
+	return userResponse{
+		Username: user.Username,
+		Email:    user.Email,
+		FullName: user.FullName,
+	}
 }

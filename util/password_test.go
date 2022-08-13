@@ -8,7 +8,8 @@ import (
 )
 
 func randomHash(t *testing.T, rawPassword string) string {
-	hashedPassword, err := HashPassword(rawPassword)
+	bcryptHasher := NewBCryptHasher()
+	hashedPassword, err := bcryptHasher.HashPassword(rawPassword)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, hashedPassword)
@@ -48,6 +49,8 @@ func TestHashPassword(t *testing.T) {
 }
 
 func TestVerifyPassword(t *testing.T) {
+	bcryptHasher := NewBCryptHasher()
+
 	testCases := []struct {
 		description string
 		testCase    func(t *testing.T)
@@ -58,7 +61,7 @@ func TestVerifyPassword(t *testing.T) {
 				rawPassword := RandomString(8)
 				hashedPassword := randomHash(t, rawPassword)
 
-				err := VerifyPassword(hashedPassword, rawPassword)
+				err := bcryptHasher.VerifyPassword(hashedPassword, rawPassword)
 				require.NoError(t, err)
 			},
 		},
@@ -68,7 +71,7 @@ func TestVerifyPassword(t *testing.T) {
 				rawPassword := RandomString(8)
 				hashedPassword := randomHash(t, rawPassword)
 
-				err := VerifyPassword(hashedPassword, RandomString(7))
+				err := bcryptHasher.VerifyPassword(hashedPassword, RandomString(7))
 				require.EqualError(t, err, bcrypt.ErrMismatchedHashAndPassword.Error())
 			},
 		},

@@ -7,28 +7,28 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-type JWTTokenizer struct {
+type JWTMaker struct {
 	SymmetricKey string
 	Duration     time.Duration
 }
 
-func NewJWTTokenizer(symmetricKey string, duration time.Duration) *JWTTokenizer {
-	return &JWTTokenizer{
+func NewJWTMaker(symmetricKey string, duration time.Duration) Maker {
+	return &JWTMaker{
 		SymmetricKey: symmetricKey,
 		Duration:     duration,
 	}
 }
 
-func (tokenizer *JWTTokenizer) CreateToken(username string) (string, error) {
-	payload := NewPayload(username, tokenizer.Duration)
+func (jwtMaker *JWTMaker) CreateToken(username string) (string, error) {
+	payload := NewPayload(username, jwtMaker.Duration)
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
-	return jwtToken.SignedString([]byte(tokenizer.SymmetricKey))
+	return jwtToken.SignedString([]byte(jwtMaker.SymmetricKey))
 }
 
-func (tokenizer *JWTTokenizer) VerifyToken(t string) (*Payload, error) {
+func (jwtMaker *JWTMaker) VerifyToken(t string) (*Payload, error) {
 	jwtToken, err := jwt.ParseWithClaims(t, &Payload{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); ok {
-			return []byte(tokenizer.SymmetricKey), nil
+			return []byte(jwtMaker.SymmetricKey), nil
 		}
 		return nil, ErrInvalidToken
 	})

@@ -7,8 +7,8 @@ var (
 	ErrInvalidToken = errors.New("invalid token")
 )
 
-type Tokenizer interface {
+type Maker interface {
 	CreateToken(username string) (string, error)
 
-	VerifyToken(token string) (Payload, error)
+	VerifyToken(token string) (*Payload, error)
 }
