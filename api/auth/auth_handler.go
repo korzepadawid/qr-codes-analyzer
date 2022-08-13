@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
@@ -21,10 +19,10 @@ type authHandler struct {
 	store           db.Store
 }
 
-func NewAuthHandler(store db.Store) *authHandler {
+func NewAuthHandler(store db.Store, tokenService token.Maker) *authHandler {
 	return &authHandler{
 		store:           store,
-		tokenService:    token.NewJWTMaker("asdfsafd", time.Hour),
+		tokenService:    tokenService,
 		passwordService: util.NewBCryptHasher(),
 	}
 }
@@ -32,5 +30,5 @@ func NewAuthHandler(store db.Store) *authHandler {
 func (h *authHandler) RegisterRoutes(router *gin.Engine) {
 	r := router.Group(routerGroupPrefix)
 	r.POST(signUpUrl, h.signUp)
-	r.POST(signInUrl, func(ctx *gin.Context) {})
+	r.POST(signInUrl, h.signIn)
 }

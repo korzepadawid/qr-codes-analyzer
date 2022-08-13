@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/korzepadawid/qr-codes-analyzer/token"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -25,8 +26,14 @@ func HandleErrors(logger *zap.Logger) gin.HandlerFunc {
 
 		if errors.As(err, &verr) {
 			ctx.JSON(http.StatusBadRequest, NewErrorResponse(fmt.Errorf("validation error")))
+		} else if errors.Is(err, token.ErrExpiredToken) || errors.Is(err, token.ErrInvalidToken) {
+			ctx.JSON(http.StatusUnauthorized, NewErrorResponse(err))
 		} else if errors.Is(err, ErrUserAlreadyExists) {
 			ctx.JSON(http.StatusBadRequest, NewErrorResponse(err))
+		} else if errors.Is(err, ErrMissingAuthorizationHeader) {
+			ctx.JSON(http.StatusBadRequest, NewErrorResponse(err))
+		} else if errors.Is(err, ErrInvalidCredentials) {
+			ctx.JSON(http.StatusUnauthorized, NewErrorResponse(err))
 		} else {
 			ctx.JSON(http.StatusInternalServerError, NewErrorResponse(fmt.Errorf("internal error")))
 		}

@@ -33,9 +33,9 @@ func (h *authHandler) signUp(ctx *gin.Context) {
 		return
 	}
 
-	exists := h.checkIfUserExists(ctx, request)
+	ok := h.checkIfUserExists(ctx, request)
 
-	if exists {
+	if !ok {
 		return
 	}
 
@@ -84,15 +84,15 @@ func (h *authHandler) checkIfUserExists(ctx *gin.Context, request signUpRequest)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			ctx.Error(err)
-			return true
+			return false
 		}
 	}
 
 	if err == nil {
 		ctx.Error(errors.ErrUserAlreadyExists)
-		return true
+		return false
 	}
-	return false
+	return true
 }
 
 func mapUserToResponse(user db.User) userResponse {
