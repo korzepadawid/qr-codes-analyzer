@@ -33,22 +33,9 @@ func (h *authHandler) signUp(ctx *gin.Context) {
 		return
 	}
 
-	gArg := db.GetUserByUsernameOrEmailParams{
-		Username: strings.ToLower(request.Username),
-		Email:    strings.ToLower(request.Email),
-	}
+	exists := h.checkIfUserExists(ctx, request)
 
-	_, err := h.store.GetUserByUsernameOrEmail(ctx, gArg)
-
-	if err != nil {
-		if err != sql.ErrNoRows {
-			ctx.Error(err)
-			return
-		}
-	}
-
-	if err == nil {
-		ctx.Error(errors.ErrUserAlreadyExists)
+	if exists {
 		return
 	}
 
@@ -59,21 +46,53 @@ func (h *authHandler) signUp(ctx *gin.Context) {
 		return
 	}
 
-	cArg := db.CreateUserParams{
+	user, ok := h.createNewUser(ctx, request, hashedPassword)
+
+	if !ok {
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, mapUserToResponse(user))
+}
+
+func (h authHandler) createNewUser(ctx *gin.Context, request signUpRequest, hashedPassword string) (db.User, bool) {
+	arg := db.CreateUserParams{
 		Username: request.Username,
 		Password: hashedPassword,
 		Email:    request.Email,
 		FullName: request.FullName,
 	}
 
-	user, err := h.store.CreateUser(ctx, cArg)
+	user, err := h.store.CreateUser(ctx, arg)
 
 	if err != nil {
 		ctx.Error(err)
-		return
+		return db.User{}, false
 	}
 
-	ctx.JSON(http.StatusCreated, mapUserToResponse(user))
+	return user, true
+}
+
+func (h *authHandler) checkIfUserExists(ctx *gin.Context, request signUpRequest) bool {
+	arg := db.GetUserByUsernameOrEmailParams{
+		Username: strings.ToLower(request.Username),
+		Email:    strings.ToLower(request.Email),
+	}
+
+	_, err := h.store.GetUserByUsernameOrEmail(ctx, arg)
+
+	if err != nil {
+		if err != sql.ErrNoRows {
+			ctx.Error(err)
+			return true
+		}
+	}
+
+	if err == nil {
+		ctx.Error(errors.ErrUserAlreadyExists)
+		return true
+	}
+	return false
 }
 
 func mapUserToResponse(user db.User) userResponse {
