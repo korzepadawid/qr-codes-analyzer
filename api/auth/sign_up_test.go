@@ -21,19 +21,19 @@ const (
 
 func TestSignUpAPI(t *testing.T) {
 
-	body := signUpRequest{
-		Username: "userek782345687",
-		Email:    "user@gmail.com",
-		FullName: "verycooluser",
-		Password: "str@on@gPa@sdword123",
-	}
-
 	user := db.User{
-		Username:  "userek782345687",
-		Email:     "user@gmail.com",
-		FullName:  "verycooluser",
+		Username:  util.RandomUsername(),
+		Email:     util.RandomMail(),
+		FullName:  util.RandomUsername(),
 		Password:  hashedPassword,
 		CreatedAt: time.Now().Add(-time.Minute),
+	}
+
+	body := signUpRequest{
+		Username: user.Username,
+		Email:    user.Email,
+		FullName: user.FullName,
+		Password: "str@on@gPa@sdword123",
 	}
 
 	createUserParams := db.CreateUserParams{
