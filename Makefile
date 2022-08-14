@@ -16,8 +16,11 @@ sqlc:
 test:
 	go test -v -cover ./...
 
-mockstore:
+mock-store:
 	mockgen --build_flags=--mod=mod -package mockdb -destination db/mock/store.go github.com/korzepadawid/qr-codes-analyzer/db/sqlc Store
 
-mocktoken:
-	mockgen --build_flags=--mod=mod -package mocktoken -destination token/mock/token.go github.com/korzepadawid/qr-codes-analyzer/token Maker
+mock-token:
+	mockgen --build_flags=--mod=mod -package mockmaker -destination token/mock/token.go github.com/korzepadawid/qr-codes-analyzer/token Maker
+
+mock-password:
+	mockgen --build_flags=--mod=mod -package mockhasher -destination util/mock/password.go github.com/korzepadawid/qr-codes-analyzer/util Hasher

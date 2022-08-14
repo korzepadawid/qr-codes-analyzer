@@ -2,7 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"github.com/korzepadawid/qr-codes-analyzer/token"
+	"github.com/korzepadawid/qr-codes-analyzer/util"
 	"log"
+	"time"
 
 	"github.com/korzepadawid/qr-codes-analyzer/api"
 	"github.com/korzepadawid/qr-codes-analyzer/config"
@@ -23,9 +26,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	store := db.NewStore(conn)
-
-	server, err := api.NewServer(*cfg, store)
+	server, err := api.NewServer(
+		*cfg,
+		db.NewStore(conn),
+		token.NewJWTMaker("fsdfsdf", time.Hour),
+		util.NewBCryptHasher(),
+	)
 
 	if err != nil {
 		log.Fatal(err)

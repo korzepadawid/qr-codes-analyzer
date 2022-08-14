@@ -8,65 +8,51 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/config"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
+	"github.com/korzepadawid/qr-codes-analyzer/util"
 	"go.uber.org/zap"
-	"time"
 )
 
 type Server struct {
-	config   config.Config
-	store    db.Store
-	router   *gin.Engine
-	handlers []common.Handler
+	Config         config.Config
+	Store          db.Store
+	Router         *gin.Engine
+	TokenMaker     token.Maker
+	PasswordHasher util.Hasher
+	Handlers       []common.Handler
 }
 
-func NewServer(config config.Config, store db.Store) (*Server, error) {
+func NewServer(config config.Config, store db.Store, maker token.Maker, hasher util.Hasher) (*Server, error) {
 	server := Server{
-		config:   config,
-		store:    store,
-		router:   gin.Default(),
-		handlers: make([]common.Handler, 0),
+		Config:         config,
+		Store:          store,
+		Router:         gin.Default(),
+		TokenMaker:     maker,
+		PasswordHasher: hasher,
+		Handlers:       make([]common.Handler, 0),
 	}
-	// deps
-	tokenService := token.NewJWTMaker("asdfsafd", time.Hour)
 
 	// setup gin
 	gin.SetMode(gin.DebugMode)
 
-	// setup uber's zap logger
+	// setup logger
 	logger, _ := zap.NewProduction()
 
 	// setup middlewares
-	server.router.Use(errors.HandleErrors(logger))
+	server.Router.Use(errors.HandleErrors(logger))
 
-	// route handlers
-	server.handlers = append(server.handlers, auth.NewAuthHandler(store, tokenService))
+	// route Handlers
+	authHandler := auth.NewAuthHandler(server.Store, server.TokenMaker, server.PasswordHasher)
+	server.Handlers = append(server.Handlers, authHandler)
 
-	for _, h := range server.handlers {
-		h.RegisterRoutes(server.router)
+	for _, h := range server.Handlers {
+		h.RegisterRoutes(server.Router)
 	}
 
-	server.router.Use(auth.SecureRoute(tokenService))
-
-	server.router.GET("/test", func(context *gin.Context) {
-		value, exists := context.Get(auth.CurrentUserKey)
-
-		if !exists {
-			context.JSON(418, gin.H{"error": "not exists"})
-			return
-		}
-
-		s, ok := value.(string)
-		if !ok {
-			context.JSON(418, gin.H{"error": "not exists"})
-			return
-		}
-
-		context.JSON(418, gin.H{"user": s})
-	})
+	server.Router.Use(auth.SecureRoute(server.TokenMaker))
 
 	return &server, nil
 }
 
 func (s *Server) Run() error {
-	return s.router.Run(s.config.Addr)
+	return s.Router.Run(s.Config.Addr)
 }

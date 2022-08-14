@@ -14,16 +14,16 @@ const (
 )
 
 type authHandler struct {
-	tokenService    token.Maker
-	passwordService util.Hasher
-	store           db.Store
+	tokenMaker     token.Maker
+	passwordHasher util.Hasher
+	store          db.Store
 }
 
-func NewAuthHandler(store db.Store, tokenService token.Maker) *authHandler {
+func NewAuthHandler(store db.Store, tokenService token.Maker, hasher util.Hasher) *authHandler {
 	return &authHandler{
-		store:           store,
-		tokenService:    tokenService,
-		passwordService: util.NewBCryptHasher(),
+		store:          store,
+		tokenMaker:     tokenService,
+		passwordHasher: hasher,
 	}
 }
 
