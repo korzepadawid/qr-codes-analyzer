@@ -18,32 +18,40 @@ func SecureRoute(tokenService token.Maker) gin.HandlerFunc {
 		authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
 
 		if isEmptyHeader(authorizationHeader) {
-			ctx.Error(errors.ErrMissingAuthorizationHeader)
-			ctx.Abort()
+			abortWithError(ctx, errors.ErrMissingAuthorizationHeader)
 			return
 		}
 
 		split := strings.Split(strings.TrimSpace(authorizationHeader), " ")
+
+		if len(split) != 2 {
+			abortWithError(ctx, errors.ErrInvalidAuthorizationType)
+			return
+		}
+
 		givenAuthorizationType := split[0]
 		givenToken := split[1]
 
 		if isNotValidAuthorizationType(givenAuthorizationType, givenToken) {
-			ctx.Error(errors.ErrInvalidAuthorizationType)
-			ctx.Abort()
+			abortWithError(ctx, errors.ErrInvalidAuthorizationType)
 			return
 		}
 
 		payload, err := tokenService.VerifyToken(givenToken)
 
 		if err != nil {
-			ctx.Error(err)
-			ctx.Abort()
+			abortWithError(ctx, err)
 			return
 		}
 
 		ctx.Set(CurrentUserKey, payload.Username)
 		ctx.Next()
 	}
+}
+
+func abortWithError(ctx *gin.Context, err error) {
+	ctx.Error(err)
+	ctx.Abort()
 }
 
 func isEmptyHeader(authorizationHeader string) bool {
