@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	CurrentUserKey         = "auth_user"
+	currentUserKey         = "auth_user"
 	authorizationHeaderKey = "Authorization"
 	authorizationType      = "Bearer"
 )
@@ -44,7 +44,7 @@ func SecureRoute(tokenService token.Maker) gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set(CurrentUserKey, payload.Username)
+		ctx.Set(currentUserKey, payload.Username)
 		ctx.Next()
 	}
 }

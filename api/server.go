@@ -5,6 +5,7 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/api/auth"
 	"github.com/korzepadawid/qr-codes-analyzer/api/common"
 	"github.com/korzepadawid/qr-codes-analyzer/api/errors"
+	"github.com/korzepadawid/qr-codes-analyzer/api/group"
 	"github.com/korzepadawid/qr-codes-analyzer/config"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
@@ -42,13 +43,13 @@ func NewServer(config config.Config, store db.Store, maker token.Maker, hasher u
 
 	// route Handlers
 	authHandler := auth.NewAuthHandler(server.Store, server.TokenMaker, server.PasswordHasher)
-	server.Handlers = append(server.Handlers, authHandler)
+	groupHandler := group.NewGroupHandler(server.Store, auth.SecureRoute(server.TokenMaker))
+
+	server.Handlers = append(server.Handlers, authHandler, groupHandler)
 
 	for _, h := range server.Handlers {
 		h.RegisterRoutes(server.Router)
 	}
-
-	server.Router.Use(auth.SecureRoute(server.TokenMaker))
 
 	return &server, nil
 }

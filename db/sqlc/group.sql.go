@@ -10,7 +10,7 @@ import (
 )
 
 const createGroup = `-- name: CreateGroup :one
-INSERT INTO groups (owner, title, description)
+INSERT INTO group (owner, title, description)
 VALUES ($1, $2, $3)
 RETURNING id, owner, title, description, created_at
 `
@@ -37,7 +37,7 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Group
 const getGroupsByOwner = `-- name: GetGroupsByOwner :many
 SELECT g.id, g.owner, g.title, g.description, g.created_at
 FROM users u
-         JOIN groups g on u.username = g.owner AND u.username = $3
+         JOIN group g on u.username = g.owner AND u.username = $3
 ORDER BY g.created_at DESC
 LIMIT $1 OFFSET $2
 `

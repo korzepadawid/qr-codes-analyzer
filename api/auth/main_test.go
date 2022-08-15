@@ -22,7 +22,7 @@ type testResponseForSecuredRoute struct {
 
 // securedRoute is an endpoint for testing auth process
 func securedRoute(ctx *gin.Context) {
-	value, exists := ctx.Get(CurrentUserKey)
+	value, exists := ctx.Get(currentUserKey)
 
 	if !exists {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "user not found in the context"})

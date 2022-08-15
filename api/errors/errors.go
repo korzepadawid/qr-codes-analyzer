@@ -7,4 +7,5 @@ var (
 	ErrInvalidCredentials         = errors.New("invalid credentials")
 	ErrMissingAuthorizationHeader = errors.New("missing \"Authorization\" header")
 	ErrInvalidAuthorizationType   = errors.New("you need to use Bearer token strategy")
+	ErrFailedCurrentUserRetrieval = errors.New("failed current user retrieval")
 )

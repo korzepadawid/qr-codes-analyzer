@@ -14,9 +14,9 @@ const (
 )
 
 type authHandler struct {
+	store          db.Store
 	tokenMaker     token.Maker
 	passwordHasher util.Hasher
-	store          db.Store
 }
 
 func NewAuthHandler(store db.Store, tokenService token.Maker, hasher util.Hasher) *authHandler {
