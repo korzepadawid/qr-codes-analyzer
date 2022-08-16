@@ -45,6 +45,15 @@ func newMockGroupHandler(store db.Store, maker token.Maker) *gin.Engine {
 	return r
 }
 
+func parseGroupPageResponse(t *testing.T, b *bytes.Buffer) common.PageResponse[db.Group] {
+	data, err := ioutil.ReadAll(b)
+	require.NoError(t, err)
+	var got common.PageResponse[db.Group]
+	err = json.Unmarshal(data, &got)
+	require.NoError(t, err)
+	return got
+}
+
 func requireMatchGroup(t *testing.T, b *bytes.Buffer, expect db.Group) {
 	data, err := ioutil.ReadAll(b)
 	require.NoError(t, err)
