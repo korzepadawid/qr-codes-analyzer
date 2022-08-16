@@ -26,8 +26,12 @@ func HandleErrors(logger *zap.Logger) gin.HandlerFunc {
 
 		if errors.As(err, &verr) {
 			ctx.JSON(http.StatusBadRequest, NewErrorResponse(fmt.Errorf("validation error")))
+		} else if errors.Is(err, ErrInvalidParamFormat) {
+			ctx.JSON(http.StatusBadRequest, NewErrorResponse(ErrInvalidParamFormat))
 		} else if errors.Is(err, token.ErrExpiredToken) || errors.Is(err, token.ErrInvalidToken) {
 			ctx.JSON(http.StatusUnauthorized, NewErrorResponse(err))
+		} else if errors.Is(err, ErrGroupNotFound) {
+			ctx.JSON(http.StatusNotFound, NewErrorResponse(err))
 		} else if errors.Is(err, ErrUserAlreadyExists) {
 			ctx.JSON(http.StatusBadRequest, NewErrorResponse(err))
 		} else if errors.Is(err, ErrMissingAuthorizationHeader) || errors.Is(err, ErrInvalidAuthorizationType) {

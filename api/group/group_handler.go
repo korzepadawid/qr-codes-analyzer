@@ -26,4 +26,5 @@ func (h *groupHandler) RegisterRoutes(router *gin.Engine) {
 	r.Use(h.middlewares...)
 	r.POST("", h.createGroup)
 	r.GET("", h.getGroupsByOwner)
+	r.GET("/:group_id", h.getGroup)
 }

@@ -11,6 +11,7 @@ import (
 type Querier interface {
 	CreateGroup(ctx context.Context, arg CreateGroupParams) (Group, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetGroupByOwnerAndID(ctx context.Context, arg GetGroupByOwnerAndIDParams) (Group, error)
 	GetGroupsByOwner(ctx context.Context, arg GetGroupsByOwnerParams) ([]Group, error)
 	GetGroupsCountByOwner(ctx context.Context, owner string) (int64, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)

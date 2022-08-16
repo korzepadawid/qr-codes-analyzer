@@ -8,4 +8,6 @@ var (
 	ErrMissingAuthorizationHeader = errors.New("missing \"Authorization\" header")
 	ErrInvalidAuthorizationType   = errors.New("you need to use Bearer token strategy")
 	ErrFailedCurrentUserRetrieval = errors.New("failed current user retrieval")
+	ErrInvalidParamFormat         = errors.New("invalid param format")
+	ErrGroupNotFound              = errors.New("group not found")
 )

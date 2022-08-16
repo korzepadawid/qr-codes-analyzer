@@ -33,6 +33,32 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Group
 	return i, err
 }
 
+const getGroupByOwnerAndID = `-- name: GetGroupByOwnerAndID :one
+SELECT g.id, g.owner, g.title, g.description, g.created_at
+FROM users u
+         JOIN groups g ON g.owner = u.username
+WHERE g.owner = $1
+  AND g.id = $2
+`
+
+type GetGroupByOwnerAndIDParams struct {
+	Owner   string `json:"owner"`
+	GroupID int64  `json:"group_id"`
+}
+
+func (q *Queries) GetGroupByOwnerAndID(ctx context.Context, arg GetGroupByOwnerAndIDParams) (Group, error) {
+	row := q.db.QueryRowContext(ctx, getGroupByOwnerAndID, arg.Owner, arg.GroupID)
+	var i Group
+	err := row.Scan(
+		&i.ID,
+		&i.Owner,
+		&i.Title,
+		&i.Description,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getGroupsByOwner = `-- name: GetGroupsByOwner :many
 SELECT g.id, g.owner, g.title, g.description, g.created_at
 FROM users u

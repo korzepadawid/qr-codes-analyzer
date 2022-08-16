@@ -19,6 +19,7 @@ import (
 const (
 	validAuthorizationHeader = "Bearer tokengoeshere"
 	groupsCount              = int64(25)
+	randomGroupID            = int64(673425)
 )
 
 var (
