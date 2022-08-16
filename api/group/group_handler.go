@@ -25,4 +25,5 @@ func (h *groupHandler) RegisterRoutes(router *gin.Engine) {
 	r := router.Group(routerGroupPrefix)
 	r.Use(h.middlewares...)
 	r.POST("", h.createGroup)
+	r.GET("", h.getGroupsByOwner)
 }
