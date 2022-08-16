@@ -35,7 +35,6 @@ func (h *groupHandler) getGroupsByOwner(ctx *gin.Context) {
 
 	// getting total count of user's groups and requested group page in parallel
 	go h.getGroupsCount(ctx, owner, errorsChannel, totalElementsChannel)
-
 	go h.getGroupsPage(ctx, owner, queryParams, errorsChannel, groupsChannel)
 
 	for i := 0; i < 2; i++ {
