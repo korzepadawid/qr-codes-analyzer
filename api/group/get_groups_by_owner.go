@@ -54,13 +54,24 @@ func (h *groupHandler) getGroupsByOwner(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *groupHandler) getGroupsCount(ctx *gin.Context, owner string, errorsChannel chan<- error, totalElementsChannel chan<- int64) {
+func (h *groupHandler) getGroupsCount(
+	ctx *gin.Context,
+	owner string,
+	errorsChannel chan<- error,
+	totalElementsChannel chan<- int64,
+) {
 	total, err := h.store.GetGroupsCountByOwner(ctx, owner)
 	errorsChannel <- err
 	totalElementsChannel <- total
 }
 
-func (h *groupHandler) getGroupsPage(ctx *gin.Context, owner string, queryParams getGroupsByOwnerQueryParams, errorsChannel chan<- error, groupsChannel chan<- []db.Group) {
+func (h *groupHandler) getGroupsPage(
+	ctx *gin.Context,
+	owner string,
+	queryParams getGroupsByOwnerQueryParams,
+	errorsChannel chan<- error,
+	groupsChannel chan<- []db.Group,
+) {
 	arg := db.GetGroupsByOwnerParams{
 		Limit:  queryParams.PageSize,
 		Offset: common.GetPageOffset(queryParams.PageNumber, queryParams.PageSize),
