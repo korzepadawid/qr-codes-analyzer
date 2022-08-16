@@ -29,26 +29,14 @@ func (h *groupHandler) getGroupsByOwner(ctx *gin.Context) {
 		return
 	}
 
+	groupsChannel := make(chan []db.Group)
 	totalElementsChannel := make(chan int64)
-	resultsChannel := make(chan []db.Group)
 	errorsChannel := make(chan error)
 
-	go func() {
-		total, err2 := h.store.GetGroupsCountByOwner(ctx, owner)
-		errorsChannel <- err2
-		totalElementsChannel <- total
-	}()
+	// getting total count of user's groups and requested group page in parallel
+	go h.getGroupsCount(ctx, owner, errorsChannel, totalElementsChannel)
 
-	go func() {
-		arg := db.GetGroupsByOwnerParams{
-			Limit:  queryParams.PageSize,
-			Offset: common.GetPageOffset(queryParams.PageNumber, queryParams.PageSize),
-			Owner:  owner,
-		}
-		groups, err2 := h.store.GetGroupsByOwner(ctx, arg)
-		errorsChannel <- err2
-		resultsChannel <- groups
-	}()
+	go h.getGroupsPage(ctx, owner, queryParams, errorsChannel, groupsChannel)
 
 	for i := 0; i < 2; i++ {
 		if cErr := <-errorsChannel; cErr != nil {
@@ -57,15 +45,29 @@ func (h *groupHandler) getGroupsByOwner(ctx *gin.Context) {
 		}
 	}
 
-	results := <-resultsChannel
-	totalElements := <-totalElementsChannel
-
 	response := common.NewPageResponse(
 		queryParams.PageNumber,
 		queryParams.PageSize,
-		common.GetLastPage(totalElements, queryParams.PageSize),
-		results,
+		common.GetLastPage(<-totalElementsChannel, queryParams.PageSize),
+		<-groupsChannel,
 	)
 
 	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *groupHandler) getGroupsCount(ctx *gin.Context, owner string, errorsChannel chan<- error, totalElementsChannel chan<- int64) {
+	total, err := h.store.GetGroupsCountByOwner(ctx, owner)
+	errorsChannel <- err
+	totalElementsChannel <- total
+}
+
+func (h *groupHandler) getGroupsPage(ctx *gin.Context, owner string, queryParams getGroupsByOwnerQueryParams, errorsChannel chan<- error, groupsChannel chan<- []db.Group) {
+	arg := db.GetGroupsByOwnerParams{
+		Limit:  queryParams.PageSize,
+		Offset: common.GetPageOffset(queryParams.PageNumber, queryParams.PageSize),
+		Owner:  owner,
+	}
+	groups, err := h.store.GetGroupsByOwner(ctx, arg)
+	errorsChannel <- err
+	groupsChannel <- groups
 }

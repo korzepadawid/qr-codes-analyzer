@@ -79,6 +79,21 @@ func (mr *MockStoreMockRecorder) GetGroupsByOwner(arg0, arg1 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupsByOwner", reflect.TypeOf((*MockStore)(nil).GetGroupsByOwner), arg0, arg1)
 }
 
+// GetGroupsCountByOwner mocks base method
+func (m *MockStore) GetGroupsCountByOwner(arg0 context.Context, arg1 string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGroupsCountByOwner", arg0, arg1)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGroupsCountByOwner indicates an expected call of GetGroupsCountByOwner
+func (mr *MockStoreMockRecorder) GetGroupsCountByOwner(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupsCountByOwner", reflect.TypeOf((*MockStore)(nil).GetGroupsCountByOwner), arg0, arg1)
+}
+
 // GetUserByEmail mocks base method
 func (m *MockStore) GetUserByEmail(arg0 context.Context, arg1 string) (sqlc.User, error) {
 	m.ctrl.T.Helper()
