@@ -27,4 +27,5 @@ func (h *groupHandler) RegisterRoutes(router *gin.Engine) {
 	r.POST("", h.createGroup)
 	r.GET("", h.getGroupsByOwner)
 	r.GET("/:group_id", h.getGroup)
+	r.DELETE("/:group_id", h.deleteGroup)
 }

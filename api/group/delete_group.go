@@ -1,7 +1,6 @@
 package group
 
 import (
-	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/korzepadawid/qr-codes-analyzer/api/auth"
 	"github.com/korzepadawid/qr-codes-analyzer/api/errors"
@@ -9,8 +8,7 @@ import (
 	"net/http"
 )
 
-// todo: implement getting count of qr-codes in the given group
-func (h *groupHandler) getGroup(ctx *gin.Context) {
+func (h *groupHandler) deleteGroup(ctx *gin.Context) {
 	groupID, ok := getGroupIDFromParams(ctx)
 
 	if !ok {
@@ -24,21 +22,17 @@ func (h *groupHandler) getGroup(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.GetGroupByOwnerAndIDParams{
-		Owner:   owner,
+	arg := db.DeleteGroupByOwnerAndIDParams{
 		GroupID: groupID,
+		Owner:   owner,
 	}
 
-	group, err := h.store.GetGroupByOwnerAndID(ctx, arg)
+	err = h.store.DeleteGroupByOwnerAndID(ctx, arg)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.Error(errors.ErrGroupNotFound)
-			return
-		}
 		ctx.Error(err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, group)
+	ctx.Status(http.StatusNoContent)
 }

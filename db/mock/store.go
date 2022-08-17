@@ -64,6 +64,20 @@ func (mr *MockStoreMockRecorder) CreateUser(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockStore)(nil).CreateUser), arg0, arg1)
 }
 
+// DeleteGroupByOwnerAndID mocks base method
+func (m *MockStore) DeleteGroupByOwnerAndID(arg0 context.Context, arg1 sqlc.DeleteGroupByOwnerAndIDParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteGroupByOwnerAndID", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteGroupByOwnerAndID indicates an expected call of DeleteGroupByOwnerAndID
+func (mr *MockStoreMockRecorder) DeleteGroupByOwnerAndID(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteGroupByOwnerAndID", reflect.TypeOf((*MockStore)(nil).DeleteGroupByOwnerAndID), arg0, arg1)
+}
+
 // GetGroupByOwnerAndID mocks base method
 func (m *MockStore) GetGroupByOwnerAndID(arg0 context.Context, arg1 sqlc.GetGroupByOwnerAndIDParams) (sqlc.Group, error) {
 	m.ctrl.T.Helper()

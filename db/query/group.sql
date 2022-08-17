@@ -15,8 +15,13 @@ FROM users u
          JOIN groups g on u.username = g.owner AND u.username = sqlc.arg(owner);
 
 -- name: GetGroupByOwnerAndID :one
-SELECT g.*
-FROM users u
-         JOIN groups g ON g.owner = u.username
-WHERE g.owner = sqlc.arg(owner)
-  AND g.id = sqlc.arg(group_id);
+SELECT *
+FROM groups
+WHERE owner = sqlc.arg(owner)
+  AND id = sqlc.arg(group_id) LIMIT 1;
+
+-- name: DeleteGroupByOwnerAndID :exec
+DELETE
+FROM groups
+WHERE id = sqlc.arg(group_id)
+  and owner = sqlc.arg(owner);

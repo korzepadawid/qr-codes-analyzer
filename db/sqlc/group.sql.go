@@ -33,12 +33,28 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Group
 	return i, err
 }
 
+const deleteGroupByOwnerAndID = `-- name: DeleteGroupByOwnerAndID :exec
+DELETE
+FROM groups
+WHERE id = $1
+  and owner = $2
+`
+
+type DeleteGroupByOwnerAndIDParams struct {
+	GroupID int64  `json:"group_id"`
+	Owner   string `json:"owner"`
+}
+
+func (q *Queries) DeleteGroupByOwnerAndID(ctx context.Context, arg DeleteGroupByOwnerAndIDParams) error {
+	_, err := q.db.ExecContext(ctx, deleteGroupByOwnerAndID, arg.GroupID, arg.Owner)
+	return err
+}
+
 const getGroupByOwnerAndID = `-- name: GetGroupByOwnerAndID :one
-SELECT g.id, g.owner, g.title, g.description, g.created_at
-FROM users u
-         JOIN groups g ON g.owner = u.username
-WHERE g.owner = $1
-  AND g.id = $2
+SELECT id, owner, title, description, created_at
+FROM groups
+WHERE owner = $1
+  AND id = $2 LIMIT 1
 `
 
 type GetGroupByOwnerAndIDParams struct {
