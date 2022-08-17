@@ -23,6 +23,8 @@ const (
 )
 
 var (
+	mockGroupUpdateTitle       = util.RandomString(6)
+	mockGroupUpdateDescription = util.RandomString(10)
 	mockUsername               = util.RandomUsername()
 	mockPayload                = &token.Payload{Username: mockUsername}
 	mockCreateGroupRequestBody = createGroupRequest{

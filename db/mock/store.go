@@ -93,6 +93,21 @@ func (mr *MockStoreMockRecorder) GetGroupByOwnerAndID(arg0, arg1 interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByOwnerAndID", reflect.TypeOf((*MockStore)(nil).GetGroupByOwnerAndID), arg0, arg1)
 }
 
+// GetGroupByOwnerAndIDForUpdate mocks base method
+func (m *MockStore) GetGroupByOwnerAndIDForUpdate(arg0 context.Context, arg1 sqlc.GetGroupByOwnerAndIDForUpdateParams) (sqlc.Group, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGroupByOwnerAndIDForUpdate", arg0, arg1)
+	ret0, _ := ret[0].(sqlc.Group)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGroupByOwnerAndIDForUpdate indicates an expected call of GetGroupByOwnerAndIDForUpdate
+func (mr *MockStoreMockRecorder) GetGroupByOwnerAndIDForUpdate(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByOwnerAndIDForUpdate", reflect.TypeOf((*MockStore)(nil).GetGroupByOwnerAndIDForUpdate), arg0, arg1)
+}
+
 // GetGroupsByOwner mocks base method
 func (m *MockStore) GetGroupsByOwner(arg0 context.Context, arg1 sqlc.GetGroupsByOwnerParams) ([]sqlc.Group, error) {
 	m.ctrl.T.Helper()
@@ -166,4 +181,34 @@ func (m *MockStore) GetUserByUsernameOrEmail(arg0 context.Context, arg1 sqlc.Get
 func (mr *MockStoreMockRecorder) GetUserByUsernameOrEmail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByUsernameOrEmail", reflect.TypeOf((*MockStore)(nil).GetUserByUsernameOrEmail), arg0, arg1)
+}
+
+// UpdateGroupByOwnerAndID mocks base method
+func (m *MockStore) UpdateGroupByOwnerAndID(arg0 context.Context, arg1 sqlc.UpdateGroupByOwnerAndIDParams) (sqlc.Group, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateGroupByOwnerAndID", arg0, arg1)
+	ret0, _ := ret[0].(sqlc.Group)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateGroupByOwnerAndID indicates an expected call of UpdateGroupByOwnerAndID
+func (mr *MockStoreMockRecorder) UpdateGroupByOwnerAndID(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateGroupByOwnerAndID", reflect.TypeOf((*MockStore)(nil).UpdateGroupByOwnerAndID), arg0, arg1)
+}
+
+// UpdateGroupTx mocks base method
+func (m *MockStore) UpdateGroupTx(arg0 context.Context, arg1 sqlc.UpdateGroupTxParams) (sqlc.Group, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateGroupTx", arg0, arg1)
+	ret0, _ := ret[0].(sqlc.Group)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateGroupTx indicates an expected call of UpdateGroupTx
+func (mr *MockStoreMockRecorder) UpdateGroupTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateGroupTx", reflect.TypeOf((*MockStore)(nil).UpdateGroupTx), arg0, arg1)
 }

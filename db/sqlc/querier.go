@@ -13,11 +13,13 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteGroupByOwnerAndID(ctx context.Context, arg DeleteGroupByOwnerAndIDParams) error
 	GetGroupByOwnerAndID(ctx context.Context, arg GetGroupByOwnerAndIDParams) (Group, error)
+	GetGroupByOwnerAndIDForUpdate(ctx context.Context, arg GetGroupByOwnerAndIDForUpdateParams) (Group, error)
 	GetGroupsByOwner(ctx context.Context, arg GetGroupsByOwnerParams) ([]Group, error)
 	GetGroupsCountByOwner(ctx context.Context, owner string) (int64, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUsernameOrEmailParams) (User, error)
+	UpdateGroupByOwnerAndID(ctx context.Context, arg UpdateGroupByOwnerAndIDParams) (Group, error)
 }
 
 var _ Querier = (*Queries)(nil)

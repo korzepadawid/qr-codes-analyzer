@@ -11,7 +11,8 @@ import (
 
 const createGroup = `-- name: CreateGroup :one
 INSERT INTO groups (owner, title, description)
-VALUES ($1, $2, $3) RETURNING id, owner, title, description, created_at
+VALUES ($1, $2, $3)
+RETURNING id, owner, title, description, created_at
 `
 
 type CreateGroupParams struct {
@@ -54,7 +55,8 @@ const getGroupByOwnerAndID = `-- name: GetGroupByOwnerAndID :one
 SELECT id, owner, title, description, created_at
 FROM groups
 WHERE owner = $1
-  AND id = $2 LIMIT 1
+  AND id = $2
+LIMIT 1
 `
 
 type GetGroupByOwnerAndIDParams struct {
@@ -75,12 +77,38 @@ func (q *Queries) GetGroupByOwnerAndID(ctx context.Context, arg GetGroupByOwnerA
 	return i, err
 }
 
+const getGroupByOwnerAndIDForUpdate = `-- name: GetGroupByOwnerAndIDForUpdate :one
+SELECT id, owner, title, description, created_at
+FROM groups
+WHERE owner = $1
+  AND id = $2
+LIMIT 1 FOR NO KEY UPDATE
+`
+
+type GetGroupByOwnerAndIDForUpdateParams struct {
+	Owner   string `json:"owner"`
+	GroupID int64  `json:"group_id"`
+}
+
+func (q *Queries) GetGroupByOwnerAndIDForUpdate(ctx context.Context, arg GetGroupByOwnerAndIDForUpdateParams) (Group, error) {
+	row := q.db.QueryRowContext(ctx, getGroupByOwnerAndIDForUpdate, arg.Owner, arg.GroupID)
+	var i Group
+	err := row.Scan(
+		&i.ID,
+		&i.Owner,
+		&i.Title,
+		&i.Description,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getGroupsByOwner = `-- name: GetGroupsByOwner :many
 SELECT g.id, g.owner, g.title, g.description, g.created_at
 FROM users u
          JOIN groups g on u.username = g.owner AND u.username = $3
-ORDER BY g.created_at DESC LIMIT $1
-OFFSET $2
+ORDER BY g.created_at DESC
+LIMIT $1 OFFSET $2
 `
 
 type GetGroupsByOwnerParams struct {
@@ -129,4 +157,38 @@ func (q *Queries) GetGroupsCountByOwner(ctx context.Context, owner string) (int6
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const updateGroupByOwnerAndID = `-- name: UpdateGroupByOwnerAndID :one
+UPDATE groups
+SET title       = $1,
+    description = $2
+WHERE id = $3
+  AND owner = $4
+RETURNING id, owner, title, description, created_at
+`
+
+type UpdateGroupByOwnerAndIDParams struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	ID          int64  `json:"id"`
+	Owner       string `json:"owner"`
+}
+
+func (q *Queries) UpdateGroupByOwnerAndID(ctx context.Context, arg UpdateGroupByOwnerAndIDParams) (Group, error) {
+	row := q.db.QueryRowContext(ctx, updateGroupByOwnerAndID,
+		arg.Title,
+		arg.Description,
+		arg.ID,
+		arg.Owner,
+	)
+	var i Group
+	err := row.Scan(
+		&i.ID,
+		&i.Owner,
+		&i.Title,
+		&i.Description,
+		&i.CreatedAt,
+	)
+	return i, err
 }
