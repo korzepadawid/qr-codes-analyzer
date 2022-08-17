@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/korzepadawid/qr-codes-analyzer/api/auth"
 	"github.com/korzepadawid/qr-codes-analyzer/api/common"
-	"github.com/korzepadawid/qr-codes-analyzer/api/errors"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"net/http"
 )
@@ -22,10 +21,9 @@ func (h *groupHandler) getGroupsByOwner(ctx *gin.Context) {
 		return
 	}
 
-	owner, err := auth.GetCurrentUserUsername(ctx)
+	owner, ok := auth.GetCurrentUserUsername(ctx)
 
-	if err != nil {
-		ctx.Error(errors.ErrFailedCurrentUserRetrieval)
+	if !ok {
 		return
 	}
 

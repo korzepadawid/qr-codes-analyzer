@@ -29,10 +29,9 @@ func (h groupHandler) updateGroup(ctx *gin.Context) {
 		return
 	}
 
-	owner, err := auth.GetCurrentUserUsername(ctx)
+	owner, ok := auth.GetCurrentUserUsername(ctx)
 
-	if err != nil {
-		ctx.Error(errors.ErrFailedCurrentUserRetrieval)
+	if !ok {
 		return
 	}
 

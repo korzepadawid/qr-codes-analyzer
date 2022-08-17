@@ -3,7 +3,6 @@ package group
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/korzepadawid/qr-codes-analyzer/api/auth"
-	"github.com/korzepadawid/qr-codes-analyzer/api/errors"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"net/http"
 )
@@ -15,10 +14,9 @@ func (h *groupHandler) deleteGroup(ctx *gin.Context) {
 		return
 	}
 
-	owner, err := auth.GetCurrentUserUsername(ctx)
+	owner, ok := auth.GetCurrentUserUsername(ctx)
 
-	if err != nil {
-		ctx.Error(errors.ErrFailedCurrentUserRetrieval)
+	if !ok {
 		return
 	}
 
@@ -27,7 +25,7 @@ func (h *groupHandler) deleteGroup(ctx *gin.Context) {
 		Owner:   owner,
 	}
 
-	err = h.store.DeleteGroupByOwnerAndID(ctx, arg)
+	err := h.store.DeleteGroupByOwnerAndID(ctx, arg)
 
 	if err != nil {
 		ctx.Error(err)
