@@ -2,6 +2,8 @@ package main
 
 import (
 	"database/sql"
+	"github.com/korzepadawid/qr-codes-analyzer/qr"
+	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
 	"github.com/korzepadawid/qr-codes-analyzer/util"
 	"log"
@@ -31,6 +33,8 @@ func main() {
 		db.NewStore(conn),
 		token.NewJWTMaker("fsdfsdf", time.Hour),
 		util.NewBCryptHasher(),
+		storage.NewAWSS3FileStorageService(cfg),
+		qr.NewQRCodeHandler(),
 	)
 
 	if err != nil {

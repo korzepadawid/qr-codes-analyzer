@@ -8,7 +8,7 @@ import (
 )
 
 func (h *groupHandler) deleteGroup(ctx *gin.Context) {
-	groupID, ok := getGroupIDFromParams(ctx)
+	groupID, ok := GetGroupIDFromParams(ctx)
 
 	if !ok {
 		return

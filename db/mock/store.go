@@ -49,6 +49,21 @@ func (mr *MockStoreMockRecorder) CreateGroup(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGroup", reflect.TypeOf((*MockStore)(nil).CreateGroup), arg0, arg1)
 }
 
+// CreateQRCode mocks base method
+func (m *MockStore) CreateQRCode(arg0 context.Context, arg1 sqlc.CreateQRCodeParams) (sqlc.QrCode, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateQRCode", arg0, arg1)
+	ret0, _ := ret[0].(sqlc.QrCode)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateQRCode indicates an expected call of CreateQRCode
+func (mr *MockStoreMockRecorder) CreateQRCode(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateQRCode", reflect.TypeOf((*MockStore)(nil).CreateQRCode), arg0, arg1)
+}
+
 // CreateUser mocks base method
 func (m *MockStore) CreateUser(arg0 context.Context, arg1 sqlc.CreateUserParams) (sqlc.User, error) {
 	m.ctrl.T.Helper()

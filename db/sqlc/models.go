@@ -17,7 +17,7 @@ type Group struct {
 }
 
 type QrCode struct {
-	ID             int64     `json:"id"`
+	Uuid           string    `json:"uuid"`
 	Owner          string    `json:"owner"`
 	GroupID        int64     `json:"group_id"`
 	UsagesCount    int64     `json:"usages_count"`
@@ -29,13 +29,13 @@ type QrCode struct {
 }
 
 type Redirect struct {
-	ID        int64     `json:"id"`
-	QrCodeID  int64     `json:"qr_code_id"`
-	Ipv4      string    `json:"ipv4"`
-	Isp       string    `json:"isp"`
-	State     string    `json:"state"`
-	Country   string    `json:"country"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         int64     `json:"id"`
+	QrCodeUuid string    `json:"qr_code_uuid"`
+	Ipv4       string    `json:"ipv4"`
+	Isp        string    `json:"isp"`
+	State      string    `json:"state"`
+	Country    string    `json:"country"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 type User struct {

@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	CreateGroup(ctx context.Context, arg CreateGroupParams) (Group, error)
+	CreateQRCode(ctx context.Context, arg CreateQRCodeParams) (QrCode, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteGroupByOwnerAndID(ctx context.Context, arg DeleteGroupByOwnerAndIDParams) error
 	GetGroupByOwnerAndID(ctx context.Context, arg GetGroupByOwnerAndIDParams) (Group, error)

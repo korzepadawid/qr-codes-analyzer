@@ -10,4 +10,5 @@ var (
 	ErrFailedCurrentUserRetrieval = errors.New("failed current user retrieval")
 	ErrInvalidParamFormat         = errors.New("invalid param format")
 	ErrGroupNotFound              = errors.New("group not found")
+	ErrQRCodeGenerationFailed     = errors.New("failed to generate new qr code")
 )

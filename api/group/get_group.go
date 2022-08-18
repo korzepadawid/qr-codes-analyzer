@@ -11,7 +11,7 @@ import (
 
 // todo: implement getting count of qr-codes in the given group
 func (h *groupHandler) getGroup(ctx *gin.Context) {
-	groupID, ok := getGroupIDFromParams(ctx)
+	groupID, ok := GetGroupIDFromParams(ctx)
 
 	if !ok {
 		return

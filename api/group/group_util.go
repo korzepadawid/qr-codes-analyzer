@@ -12,7 +12,7 @@ const (
 	groupIDParamName = "group_id"
 )
 
-func getGroupIDFromParams(ctx *gin.Context) (int64, bool) {
+func GetGroupIDFromParams(ctx *gin.Context) (int64, bool) {
 	param := ctx.Param(groupIDParamName)
 	groupID, err := strconv.ParseInt(param, baseSystem, bitSize)
 

@@ -16,7 +16,7 @@ type updateGroupRequest struct {
 }
 
 func (h groupHandler) updateGroup(ctx *gin.Context) {
-	groupID, ok := getGroupIDFromParams(ctx)
+	groupID, ok := GetGroupIDFromParams(ctx)
 
 	if !ok {
 		return

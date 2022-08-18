@@ -2,10 +2,21 @@ package config
 
 import "github.com/spf13/viper"
 
+const (
+	EnvDev  = "dev"
+	EnvProd = "prod"
+	EnvTest = "test"
+)
+
 type Config struct {
-	DBDriver string `mapstructure:"DB_DRIVER"`
-	DBSource string `mapstructure:"DB_SOURCE"`
-	Addr     string `mapstructure:"ADDR"`
+	DBDriver        string `mapstructure:"DB_DRIVER"`
+	DBSource        string `mapstructure:"DB_SOURCE"`
+	Addr            string `mapstructure:"ADDR"`
+	Env             string `mapstructure:"ENV"`
+	AWSBucketName   string `mapstructure:"AWS_BUCKET_NAME"`
+	AWSBucketRegion string `mapstructure:"AWS_BUCKET_REGION"`
+	CDNAddress      string `mapstructure:"CDN_ADDRESS"`
+	AppURL          string `mapstructure:"APP_URL"`
 }
 
 func Load(path string) (*Config, error) {
