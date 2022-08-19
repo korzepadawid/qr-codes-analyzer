@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	routePrefix          = "/encode-codes"
-	routePrefixWithGroup = "/groups/:group_id/encode-codes"
+	routePrefix          = "/qr-codes"
+	routePrefixWithGroup = "/groups/:group_id/qr-codes"
 )
 
 type qrCodeHandler struct {

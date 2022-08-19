@@ -14,7 +14,7 @@ var (
 )
 
 type getUserFunc func(context.Context, string) (db.User, error)
-type getUserExec func(*gin.Context, string) (db.User, bool)
+type getUserExec func(*gin.Context, string) (db.User, error)
 
 type signInRequest struct {
 	Username string `json:"username" binding:"required,min=3,max=255"`
@@ -34,18 +34,20 @@ func (h *authHandler) signIn(ctx *gin.Context) {
 	}
 
 	getUser := prepareGetUserQuery(h.store.GetUserByUsername)
+	emailProvided := emailProvidedInsteadOfUsername(request.Username)
 
-	if emailProvidedInsteadOfUsername(request.Username) {
+	if emailProvided {
 		getUser = prepareGetUserQuery(h.store.GetUserByEmail)
 	}
 
-	user, ok := getUser(ctx, request.Username)
+	user, err := getUser(ctx, request.Username)
 
-	if !ok {
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 
-	err := h.pass.VerifyPassword(user.Password, request.Password)
+	err = h.pass.VerifyPassword(user.Password, request.Password)
 
 	if err != nil {
 		ctx.Error(errors.ErrInvalidCredentials)
@@ -69,15 +71,14 @@ func newSingInResponse(token string) signInResponse {
 }
 
 func prepareGetUserQuery(fn getUserFunc) getUserExec {
-	return func(ctx *gin.Context, arg string) (db.User, bool) {
+	return func(ctx *gin.Context, arg string) (db.User, error) {
 		user, err := fn(ctx, arg)
 
 		if err != nil {
-			ctx.Error(errors.ErrInvalidCredentials)
-			return db.User{}, false
+			return db.User{}, errors.ErrInvalidCredentials
 		}
 
-		return user, true
+		return user, nil
 	}
 }
 
