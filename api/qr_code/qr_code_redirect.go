@@ -10,6 +10,14 @@ const paramNameUUID = "uuid"
 
 func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
 	uuid := ctx.Param(paramNameUUID)
+
+	v, err := h.cache.Get(paramNameUUID)
+
+	if err == nil {
+		ctx.Redirect(http.StatusPermanentRedirect, v)
+		return
+	}
+
 	qrCode, err := h.store.GetQRCode(ctx, uuid)
 
 	if err != nil {

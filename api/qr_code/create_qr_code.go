@@ -8,6 +8,7 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/api/auth"
 	"github.com/korzepadawid/qr-codes-analyzer/api/errors"
 	"github.com/korzepadawid/qr-codes-analyzer/api/group"
+	"github.com/korzepadawid/qr-codes-analyzer/cache"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"log"
@@ -62,7 +63,7 @@ func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {
 	keyUUID := uuid.NewString() // PK
 
 	// generates QRCode to the redirect url
-	qrCode, err := h.genereateQRCode(keyUUID)
+	qrCode, err := h.generateQRCode(keyUUID)
 
 	if err != nil {
 		ctx.Error(err)
@@ -85,6 +86,18 @@ func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
+
+	go func() {
+		cacheErr := h.cache.Set(&cache.SetParams{
+			Key:      keyUUID,
+			Value:    QRCode.RedirectionUrl,
+			Duration: time.Minute * 2,
+		})
+
+		if cacheErr != nil {
+			panic(cacheErr)
+		}
+	}()
 
 	ctx.JSON(http.StatusCreated, newCreateQRCodeResponse(QRCode))
 }
@@ -138,7 +151,7 @@ func (h qrCodeHandler) putQRCodeImageToFileStorage(ctx *gin.Context, uuid string
 	return storageKeyWithFileExtension, nil
 }
 
-func (h qrCodeHandler) genereateQRCode(uuid string) (*[]byte, error) {
+func (h qrCodeHandler) generateQRCode(uuid string) (*[]byte, error) {
 	qrCode, err := h.qrCodeEncoder.Encode(fmt.Sprintf("%s/encode-codes/%s/redirect", h.config.AppURL, uuid))
 
 	if err != nil {

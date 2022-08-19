@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"github.com/korzepadawid/qr-codes-analyzer/cache"
 	"github.com/korzepadawid/qr-codes-analyzer/encode"
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
@@ -35,6 +36,7 @@ func main() {
 		util.NewBCryptHasher(),
 		storage.NewAWSS3FileStorageService(cfg),
 		encode.NewQRCodeEncoder(),
+		cache.NewRedisCache(),
 	)
 
 	if err != nil {

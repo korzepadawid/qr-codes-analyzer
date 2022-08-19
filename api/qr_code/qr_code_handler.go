@@ -2,6 +2,7 @@ package qr_code
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/korzepadawid/qr-codes-analyzer/cache"
 	"github.com/korzepadawid/qr-codes-analyzer/config"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/encode"
@@ -21,6 +22,7 @@ type qrCodeHandler struct {
 	middlewares   []gin.HandlerFunc
 	storage       storage.FileStorage
 	qrCodeEncoder encode.Encoder
+	cache         cache.Cache
 }
 
 func NewQRCodeHandler(
@@ -28,6 +30,7 @@ func NewQRCodeHandler(
 	config config.Config,
 	fileStorage storage.FileStorage,
 	qrCodeEncoder encode.Encoder,
+	cache cache.Cache,
 	middlewares ...gin.HandlerFunc,
 ) *qrCodeHandler {
 	return &qrCodeHandler{
@@ -36,6 +39,7 @@ func NewQRCodeHandler(
 		middlewares:   middlewares,
 		storage:       fileStorage,
 		qrCodeEncoder: qrCodeEncoder,
+		cache:         cache,
 	}
 }
 
