@@ -13,11 +13,13 @@ const (
 	authorizationType      = "Bearer"
 )
 
-func SecureRoute(tokenService token.Maker) gin.HandlerFunc {
+func SecureRoute(tokenService token.Provider) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
 
-		if isEmptyHeader(authorizationHeader) {
+		is := isEmptyHeader(authorizationHeader)
+
+		if is {
 			abortWithError(ctx, errors.ErrMissingAuthorizationHeader)
 			return
 		}
@@ -32,7 +34,9 @@ func SecureRoute(tokenService token.Maker) gin.HandlerFunc {
 		givenAuthorizationType := split[0]
 		givenToken := split[1]
 
-		if isNotValidAuthorizationType(givenAuthorizationType, givenToken) {
+		notValidAuthorizationType := isNotValidAuthorizationType(givenAuthorizationType, givenToken)
+
+		if notValidAuthorizationType {
 			abortWithError(ctx, errors.ErrInvalidAuthorizationType)
 			return
 		}

@@ -20,7 +20,7 @@ mock-store:
 	mockgen --build_flags=--mod=mod -package mockdb -destination db/mock/store.go github.com/korzepadawid/qr-codes-analyzer/db/sqlc Store
 
 mock-token:
-	mockgen --build_flags=--mod=mod -package mockmaker -destination token/mock/token.go github.com/korzepadawid/qr-codes-analyzer/token Maker
+	mockgen --build_flags=--mod=mod -package mocktoken -destination token/mock/token.go github.com/korzepadawid/qr-codes-analyzer/token Provider
 
 mock-password:
-	mockgen --build_flags=--mod=mod -package mockhasher -destination util/mock/password.go github.com/korzepadawid/qr-codes-analyzer/util Hasher
+	mockgen --build_flags=--mod=mod -package mockpassword -destination util/mock/password.go github.com/korzepadawid/qr-codes-analyzer/util PasswordService

@@ -1,4 +1,4 @@
-package qr
+package encode
 
 import "github.com/skip2/go-qrcode"
 
@@ -10,10 +10,10 @@ type Encoder interface {
 
 type qrCodeEncoder struct{}
 
-func NewQRCodeHandler() Encoder {
-	return qrCodeEncoder{}
+func NewQRCodeEncoder() *qrCodeEncoder {
+	return &qrCodeEncoder{}
 }
 
-func (q qrCodeEncoder) Encode(url string) ([]byte, error) {
+func (q *qrCodeEncoder) Encode(url string) ([]byte, error) {
 	return qrcode.Encode(url, qrcode.Medium, qrCodeSize)
 }

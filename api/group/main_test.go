@@ -40,10 +40,10 @@ var (
 	}
 )
 
-func newMockGroupHandler(store db.Store, maker token.Maker) *gin.Engine {
+func newMockGroupHandler(store db.Store, tokenProvider token.Provider) *gin.Engine {
 	r := gin.Default()
 	common.SetUpErrorHandler(r)
-	newGroupHandler := NewGroupHandler(store, auth.SecureRoute(maker))
+	newGroupHandler := NewGroupHandler(store, auth.SecureRoute(tokenProvider))
 	newGroupHandler.RegisterRoutes(r)
 	return r
 }

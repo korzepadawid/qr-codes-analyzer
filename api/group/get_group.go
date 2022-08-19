@@ -9,17 +9,19 @@ import (
 	"net/http"
 )
 
-// todo: implement getting count of qr-codes in the given group
+// todo: implement getting count of encode-codes in the given group
 func (h *groupHandler) getGroup(ctx *gin.Context) {
-	groupID, ok := GetGroupIDFromParams(ctx)
+	groupID, err := GetGroupIDFromParams(ctx)
 
-	if !ok {
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 
-	owner, ok := auth.GetCurrentUserUsername(ctx)
+	owner, err := auth.GetCurrentUserUsername(ctx)
 
-	if !ok {
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
-	mockmaker "github.com/korzepadawid/qr-codes-analyzer/token/mock"
+	mocktoken "github.com/korzepadawid/qr-codes-analyzer/token/mock"
 	"github.com/korzepadawid/qr-codes-analyzer/util"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -29,12 +29,12 @@ func TestAuthorizationMiddleware(t *testing.T) {
 	testCases := []struct {
 		description   string
 		header        testHeader
-		buildStabs    func(t *testing.T, maker *mockmaker.MockMaker)
+		buildStabs    func(t *testing.T, maker *mocktoken.MockProvider)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			description: "should return 401 when no Authorization header",
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Eq("")).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -47,8 +47,8 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: "",
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
-				maker.EXPECT().VerifyToken(gomock.Any()).Times(0)
+			buildStabs: func(t *testing.T, tokenProvider *mocktoken.MockProvider) {
+				tokenProvider.EXPECT().VerifyToken(gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
@@ -60,7 +60,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: "BAarer",
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -73,7 +73,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: "BAarer ",
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -86,7 +86,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: "BAer  ",
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -99,7 +99,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: fmt.Sprintf("%s %s %s", authorizationType, "somerandomtext", "anotherrandom text"),
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -112,7 +112,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: fmt.Sprintf("%s  %s %s", authorizationType, "somerandomtext", "anotherrandom text"),
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -125,7 +125,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: fmt.Sprintf("%s  %s", authorizationType, "theregoestoken"),
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -138,7 +138,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: fmt.Sprintf("%s %s", authorizationType, testToken),
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Eq(testToken)).Times(1).Return(&token.Payload{}, token.ErrInvalidToken)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -151,7 +151,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: fmt.Sprintf("%s %s", authorizationType, testToken),
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Eq(testToken)).Times(1).Return(&token.Payload{}, token.ErrExpiredToken)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -164,7 +164,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 				key:   authorizationHeaderKey,
 				value: fmt.Sprintf("%s %s", authorizationType, testToken),
 			},
-			buildStabs: func(t *testing.T, maker *mockmaker.MockMaker) {
+			buildStabs: func(t *testing.T, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Eq(testToken)).Times(1).Return(&token.Payload{
 					Username: testUsername,
 				}, nil)
@@ -180,7 +180,7 @@ func TestAuthorizationMiddleware(t *testing.T) {
 		t.Run(tC.description, func(t *testing.T) {
 			// mocks
 			ctrl := gomock.NewController(t)
-			mockMaker := mockmaker.NewMockMaker(ctrl)
+			mockMaker := mocktoken.NewMockProvider(ctrl)
 
 			// build stabs
 			tC.buildStabs(t, mockMaker)

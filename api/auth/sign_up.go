@@ -55,7 +55,7 @@ func (h *authHandler) signUp(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, mapUserToResponse(user))
 }
 
-func (h authHandler) createNewUser(ctx *gin.Context, request signUpRequest, hashedPassword string) (db.User, bool) {
+func (h *authHandler) createNewUser(ctx *gin.Context, request signUpRequest, hashedPassword string) (db.User, bool) {
 	arg := db.CreateUserParams{
 		Username: request.Username,
 		Password: hashedPassword,

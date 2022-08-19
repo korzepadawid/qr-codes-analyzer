@@ -15,13 +15,7 @@ type updateGroupRequest struct {
 	Description string `json:"description,omitempty" binding:"max=255"`
 }
 
-func (h groupHandler) updateGroup(ctx *gin.Context) {
-	groupID, ok := GetGroupIDFromParams(ctx)
-
-	if !ok {
-		return
-	}
-
+func (h *groupHandler) updateGroup(ctx *gin.Context) {
 	var request updateGroupRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -29,9 +23,17 @@ func (h groupHandler) updateGroup(ctx *gin.Context) {
 		return
 	}
 
-	owner, ok := auth.GetCurrentUserUsername(ctx)
+	groupID, err := GetGroupIDFromParams(ctx)
 
-	if !ok {
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	owner, err := auth.GetCurrentUserUsername(ctx)
+
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 

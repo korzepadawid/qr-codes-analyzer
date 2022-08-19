@@ -24,7 +24,7 @@ type AWSS3FileStorage struct {
 	bucketRegion string
 }
 
-func NewAWSS3FileStorageService(c *localcfg.Config) FileStorage {
+func NewAWSS3FileStorageService(c *localcfg.Config) *AWSS3FileStorage {
 	ctx := context.Background()
 
 	cfg, err := config.LoadDefaultConfig(ctx)

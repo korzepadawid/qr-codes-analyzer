@@ -6,7 +6,7 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/api/common"
 	mockdb "github.com/korzepadawid/qr-codes-analyzer/db/mock"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
-	mockmaker "github.com/korzepadawid/qr-codes-analyzer/token/mock"
+	mocktoken "github.com/korzepadawid/qr-codes-analyzer/token/mock"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -22,20 +22,20 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 		description         string
 		authorizationHeader string
 		queryParams         string
-		buildStabs          func(*mockdb.MockStore, *mockmaker.MockMaker)
+		buildStabs          func(*mockdb.MockStore, *mocktoken.MockProvider)
 		checkResponse       func(*testing.T, *httptest.ResponseRecorder)
 	}{
 		{
 			description:         "should return first page when first page requested",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_size=10&page_number=1",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, tokenProvider *mocktoken.MockProvider) {
 				arg := db.GetGroupsByOwnerParams{
 					Limit:  10,
 					Offset: 0,
 					Owner:  mockPayload.Username,
 				}
-				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
+				tokenProvider.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupsCountByOwner(gomock.Any(), mockPayload.Username).Times(1).Return(groupsCount, nil)
 				store.EXPECT().GetGroupsByOwner(gomock.Any(), arg).Times(1).Return(groups, nil)
 			},
@@ -53,7 +53,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return first page and valid last page number when first page requested",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_size=10&page_number=1",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				arg := db.GetGroupsByOwnerParams{
 					Limit:  10,
 					Offset: 0,
@@ -77,7 +77,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return second page and valid last page number when second page requested",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_size=10&page_number=2",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				arg := db.GetGroupsByOwnerParams{
 					Limit:  10,
 					Offset: 10,
@@ -101,7 +101,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return error when db error while getting page",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_size=10&page_number=2",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				arg := db.GetGroupsByOwnerParams{
 					Limit:  10,
 					Offset: 10,
@@ -119,7 +119,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return error when db error while counting rows",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_size=10&page_number=2",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				arg := db.GetGroupsByOwnerParams{
 					Limit:  10,
 					Offset: 10,
@@ -137,7 +137,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return error when errors in both goroutines",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_size=10&page_number=2",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				arg := db.GetGroupsByOwnerParams{
 					Limit:  10,
 					Offset: 10,
@@ -155,7 +155,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return error when missing required param",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_number=2",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupsCountByOwner(gomock.Any(), mockPayload.Username).Times(0)
 				store.EXPECT().GetGroupsByOwner(gomock.Any(), gomock.Any()).Times(0)
@@ -168,7 +168,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return error when negative page number",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_number=-1&page_size=10",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupsCountByOwner(gomock.Any(), mockPayload.Username).Times(0)
 				store.EXPECT().GetGroupsByOwner(gomock.Any(), gomock.Any()).Times(0)
@@ -181,7 +181,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return error when negative page size",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_number=2&page_size=-10",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupsCountByOwner(gomock.Any(), mockPayload.Username).Times(0)
 				store.EXPECT().GetGroupsByOwner(gomock.Any(), gomock.Any()).Times(0)
@@ -194,7 +194,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return error when page size is equal zero",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_number=2&page_size=0",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupsCountByOwner(gomock.Any(), mockPayload.Username).Times(0)
 				store.EXPECT().GetGroupsByOwner(gomock.Any(), gomock.Any()).Times(0)
@@ -207,7 +207,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 			description:         "should return error when page number is equal zero",
 			authorizationHeader: validAuthorizationHeader,
 			queryParams:         "?page_number=0&page_size=11",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, maker *mocktoken.MockProvider) {
 				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupsCountByOwner(gomock.Any(), mockPayload.Username).Times(0)
 				store.EXPECT().GetGroupsByOwner(gomock.Any(), gomock.Any()).Times(0)
@@ -222,7 +222,7 @@ func TestGetGroupsByOwnerAPI(t *testing.T) {
 		t.Run(tC.description, func(t *testing.T) {
 			// mocks
 			ctrl := gomock.NewController(t)
-			mockMaker := mockmaker.NewMockMaker(ctrl)
+			mockMaker := mocktoken.NewMockProvider(ctrl)
 			mockStore := mockdb.NewMockStore(ctrl)
 
 			// stabs

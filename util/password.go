@@ -2,19 +2,19 @@ package util
 
 import "golang.org/x/crypto/bcrypt"
 
-type Hasher interface {
+type PasswordService interface {
 	HashPassword(rawPassword string) (string, error)
 
 	VerifyPassword(hashedPassword, rawPassword string) error
 }
 
-type BCryptHasher struct{}
+type BCryptPasswordService struct{}
 
-func NewBCryptHasher() Hasher {
-	return &BCryptHasher{}
+func NewBCryptHasher() *BCryptPasswordService {
+	return &BCryptPasswordService{}
 }
 
-func (b *BCryptHasher) HashPassword(rawPassword string) (string, error) {
+func (b *BCryptPasswordService) HashPassword(rawPassword string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(rawPassword), bcrypt.DefaultCost)
 
 	if err != nil {
@@ -24,6 +24,6 @@ func (b *BCryptHasher) HashPassword(rawPassword string) (string, error) {
 	return string(bytes), nil
 }
 
-func (b *BCryptHasher) VerifyPassword(hashedPassword, rawPassword string) error {
+func (b *BCryptPasswordService) VerifyPassword(hashedPassword, rawPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(rawPassword))
 }

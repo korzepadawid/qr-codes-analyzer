@@ -39,7 +39,7 @@ func securedRoute(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, testResponseForSecuredRoute{user})
 }
 
-func setUpAuthMiddleware(maker token.Maker) *gin.Engine {
+func setUpAuthMiddleware(maker token.Provider) *gin.Engine {
 	r := gin.Default()
 	setUpErrorHandler(r)
 	r.Use(SecureRoute(maker))
@@ -47,7 +47,7 @@ func setUpAuthMiddleware(maker token.Maker) *gin.Engine {
 	return r
 }
 
-func setUpHandler(store db.Store, maker token.Maker, hasher util.Hasher) *gin.Engine {
+func setUpHandler(store db.Store, maker token.Provider, hasher util.PasswordService) *gin.Engine {
 	r := gin.Default()
 	handler := NewAuthHandler(store, maker, hasher)
 	setUpErrorHandler(r)

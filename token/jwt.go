@@ -7,25 +7,25 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-type JWTMaker struct {
+type JWTTokenProvider struct {
 	SymmetricKey string
 	Duration     time.Duration
 }
 
-func NewJWTMaker(symmetricKey string, duration time.Duration) Maker {
-	return &JWTMaker{
+func NewJWTMaker(symmetricKey string, duration time.Duration) *JWTTokenProvider {
+	return &JWTTokenProvider{
 		SymmetricKey: symmetricKey,
 		Duration:     duration,
 	}
 }
 
-func (jwtMaker *JWTMaker) CreateToken(username string) (string, error) {
+func (jwtMaker *JWTTokenProvider) CreateToken(username string) (string, error) {
 	payload := NewPayload(username, jwtMaker.Duration)
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	return jwtToken.SignedString([]byte(jwtMaker.SymmetricKey))
 }
 
-func (jwtMaker *JWTMaker) VerifyToken(t string) (*Payload, error) {
+func (jwtMaker *JWTTokenProvider) VerifyToken(t string) (*Payload, error) {
 	jwtToken, err := jwt.ParseWithClaims(t, &Payload{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); ok {
 			return []byte(jwtMaker.SymmetricKey), nil

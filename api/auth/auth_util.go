@@ -5,20 +5,18 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/api/errors"
 )
 
-func GetCurrentUserUsername(ctx *gin.Context) (string, bool) {
+func GetCurrentUserUsername(ctx *gin.Context) (string, error) {
 	v, exists := ctx.Get(currentUserKey)
 
 	if !exists {
-		ctx.Error(errors.ErrFailedCurrentUserRetrieval)
-		return "", false
+		return "", errors.ErrFailedCurrentUserRetrieval
 	}
 
 	owner, ok := v.(string)
 
 	if !ok {
-		ctx.Error(errors.ErrFailedCurrentUserRetrieval)
-		return "", false
+		return "", errors.ErrFailedCurrentUserRetrieval
 	}
 
-	return owner, true
+	return owner, nil
 }

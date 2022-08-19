@@ -6,7 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/korzepadawid/qr-codes-analyzer/db/mock"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
-	mockmaker "github.com/korzepadawid/qr-codes-analyzer/token/mock"
+	mocktoken "github.com/korzepadawid/qr-codes-analyzer/token/mock"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -18,19 +18,19 @@ func TestDeleteGroupAPI(t *testing.T) {
 		description         string
 		authorizationHeader string
 		routeParam          string
-		buildStabs          func(*mockdb.MockStore, *mockmaker.MockMaker)
+		buildStabs          func(*mockdb.MockStore, *mocktoken.MockProvider)
 		checkResponse       func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			description:         "should perform db query when ok",
 			authorizationHeader: validAuthorizationHeader,
 			routeParam:          fmt.Sprintf("/%d", randomGroupID),
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, tokenProvider *mocktoken.MockProvider) {
 				arg := db.DeleteGroupByOwnerAndIDParams{
 					GroupID: randomGroupID,
 					Owner:   mockPayload.Username,
 				}
-				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
+				tokenProvider.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().DeleteGroupByOwnerAndID(gomock.Any(), arg).Times(1).Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -41,12 +41,12 @@ func TestDeleteGroupAPI(t *testing.T) {
 			description:         "should perform db query when ok",
 			authorizationHeader: validAuthorizationHeader,
 			routeParam:          fmt.Sprintf("/%d", randomGroupID),
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, tokenProvider *mocktoken.MockProvider) {
 				arg := db.DeleteGroupByOwnerAndIDParams{
 					GroupID: randomGroupID,
 					Owner:   mockPayload.Username,
 				}
-				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
+				tokenProvider.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().DeleteGroupByOwnerAndID(gomock.Any(), arg).Times(1).Return(sql.ErrConnDone)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -59,7 +59,7 @@ func TestDeleteGroupAPI(t *testing.T) {
 		t.Run(tC.description, func(t *testing.T) {
 			// mocks
 			ctrl := gomock.NewController(t)
-			mockMaker := mockmaker.NewMockMaker(ctrl)
+			mockMaker := mocktoken.NewMockProvider(ctrl)
 			mockStore := mockdb.NewMockStore(ctrl)
 
 			// stabs

@@ -6,7 +6,7 @@ import (
 	mockdb "github.com/korzepadawid/qr-codes-analyzer/db/mock"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/util"
-	mockhasher "github.com/korzepadawid/qr-codes-analyzer/util/mock"
+	mockpassword "github.com/korzepadawid/qr-codes-analyzer/util/mock"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
@@ -46,16 +46,16 @@ func TestSignUpAPI(t *testing.T) {
 	testCases := []struct {
 		description   string
 		requestBody   signUpRequest
-		buildStabs    func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher)
+		buildStabs    func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			description: "creates a new user when user doesn't exist",
 			requestBody: body,
-			buildStabs: func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher) {
+			buildStabs: func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService) {
 				arg := mapRequestToGetUserByUsernameOrEmailParams(body)
 				store.EXPECT().GetUserByUsernameOrEmail(gomock.Any(), gomock.Eq(arg)).Times(1).Return(db.User{}, sql.ErrNoRows)
-				hasher.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(1).Return(hashedPassword, nil)
+				passwordService.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(1).Return(hashedPassword, nil)
 				store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(createUserParams)).Times(1).Return(user, nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -66,10 +66,10 @@ func TestSignUpAPI(t *testing.T) {
 		{
 			description: "returns an error when user exists",
 			requestBody: body,
-			buildStabs: func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher) {
+			buildStabs: func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService) {
 				arg := mapRequestToGetUserByUsernameOrEmailParams(body)
 				store.EXPECT().GetUserByUsernameOrEmail(gomock.Any(), gomock.Eq(arg)).Times(1).Return(user, nil)
-				hasher.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
+				passwordService.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
 				store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(createUserParams)).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -79,10 +79,10 @@ func TestSignUpAPI(t *testing.T) {
 		{
 			description: "returns an error when db connection interrupted when checking existence of user",
 			requestBody: body,
-			buildStabs: func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher) {
+			buildStabs: func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService) {
 				arg := mapRequestToGetUserByUsernameOrEmailParams(body)
 				store.EXPECT().GetUserByUsernameOrEmail(gomock.Any(), gomock.Eq(arg)).Times(1).Return(db.User{}, sql.ErrConnDone)
-				hasher.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
+				passwordService.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
 				store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(createUserParams)).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -92,10 +92,10 @@ func TestSignUpAPI(t *testing.T) {
 		{
 			description: "returns an error when connection interrupted while inserting a new record",
 			requestBody: body,
-			buildStabs: func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher) {
+			buildStabs: func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService) {
 				arg := mapRequestToGetUserByUsernameOrEmailParams(body)
 				store.EXPECT().GetUserByUsernameOrEmail(gomock.Any(), gomock.Eq(arg)).Times(1).Return(db.User{}, sql.ErrNoRows)
-				hasher.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(1).Return(hashedPassword, nil)
+				passwordService.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(1).Return(hashedPassword, nil)
 				store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(createUserParams)).Times(1).Return(db.User{}, sql.ErrConnDone)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -105,10 +105,10 @@ func TestSignUpAPI(t *testing.T) {
 		{
 			description: "returns an error when bcrypt returns an error",
 			requestBody: body,
-			buildStabs: func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher) {
+			buildStabs: func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService) {
 				arg := mapRequestToGetUserByUsernameOrEmailParams(body)
 				store.EXPECT().GetUserByUsernameOrEmail(gomock.Any(), gomock.Eq(arg)).Times(1).Return(db.User{}, sql.ErrNoRows)
-				hasher.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(1).Return(hashedPassword, bcrypt.ErrHashTooShort)
+				passwordService.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(1).Return(hashedPassword, bcrypt.ErrHashTooShort)
 				store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(createUserParams)).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -123,10 +123,10 @@ func TestSignUpAPI(t *testing.T) {
 				FullName: user.FullName,
 				Password: user.Password,
 			},
-			buildStabs: func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher) {
+			buildStabs: func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService) {
 				arg := mapRequestToGetUserByUsernameOrEmailParams(body)
 				store.EXPECT().GetUserByUsernameOrEmail(gomock.Any(), gomock.Eq(arg)).Times(0)
-				hasher.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
+				passwordService.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
 				store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(createUserParams)).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -139,10 +139,10 @@ func TestSignUpAPI(t *testing.T) {
 				Username: user.Username,
 				Password: user.Password,
 			},
-			buildStabs: func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher) {
+			buildStabs: func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService) {
 				arg := mapRequestToGetUserByUsernameOrEmailParams(body)
 				store.EXPECT().GetUserByUsernameOrEmail(gomock.Any(), gomock.Eq(arg)).Times(0)
-				hasher.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
+				passwordService.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
 				store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(createUserParams)).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -155,10 +155,10 @@ func TestSignUpAPI(t *testing.T) {
 				Username: user.Username,
 				Password: user.Password,
 			},
-			buildStabs: func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher) {
+			buildStabs: func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService) {
 				arg := mapRequestToGetUserByUsernameOrEmailParams(body)
 				store.EXPECT().GetUserByUsernameOrEmail(gomock.Any(), gomock.Eq(arg)).Times(0)
-				hasher.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
+				passwordService.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
 				store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(createUserParams)).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -173,10 +173,10 @@ func TestSignUpAPI(t *testing.T) {
 				FullName: "f@dsafasdf",
 				Password: user.Password,
 			},
-			buildStabs: func(t *testing.T, store *mockdb.MockStore, hasher *mockhasher.MockHasher) {
+			buildStabs: func(t *testing.T, store *mockdb.MockStore, passwordService *mockpassword.MockPasswordService) {
 				arg := mapRequestToGetUserByUsernameOrEmailParams(body)
 				store.EXPECT().GetUserByUsernameOrEmail(gomock.Any(), gomock.Eq(arg)).Times(0)
-				hasher.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
+				passwordService.EXPECT().HashPassword(gomock.Eq(body.Password)).Times(0)
 				store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(createUserParams)).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -188,14 +188,14 @@ func TestSignUpAPI(t *testing.T) {
 	// creating mocks
 	ctrl := gomock.NewController(t)
 	store := mockdb.NewMockStore(ctrl)
-	hasher := mockhasher.NewMockHasher(ctrl)
-	r := setUpHandler(store, nil, hasher)
+	passwordService := mockpassword.NewMockPasswordService(ctrl)
+	r := setUpHandler(store, nil, passwordService)
 
 	for _, tC := range testCases {
 		t.Run(tC.description, func(t *testing.T) {
 
 			// building stabs
-			tC.buildStabs(t, store, hasher)
+			tC.buildStabs(t, store, passwordService)
 
 			// server & response
 			request, err := http.NewRequest(http.MethodPost, routerGroupPrefix+signUpUrl, util.MarshallBody(tC.requestBody))

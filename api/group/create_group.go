@@ -20,9 +20,10 @@ func (h *groupHandler) createGroup(ctx *gin.Context) {
 		return
 	}
 
-	owner, ok := auth.GetCurrentUserUsername(ctx)
+	owner, err := auth.GetCurrentUserUsername(ctx)
 
-	if !ok {
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 

@@ -6,7 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/korzepadawid/qr-codes-analyzer/db/mock"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
-	mockmaker "github.com/korzepadawid/qr-codes-analyzer/token/mock"
+	mocktoken "github.com/korzepadawid/qr-codes-analyzer/token/mock"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -18,19 +18,19 @@ func TestGetGroupAPI(t *testing.T) {
 		description         string
 		authorizationHeader string
 		routeParam          string
-		buildStabs          func(*mockdb.MockStore, *mockmaker.MockMaker)
+		buildStabs          func(*mockdb.MockStore, *mocktoken.MockProvider)
 		checkResponse       func(*testing.T, *httptest.ResponseRecorder)
 	}{
 		{
 			description:         "should return group when exists",
 			authorizationHeader: validAuthorizationHeader,
 			routeParam:          fmt.Sprintf("/%d", randomGroupID),
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, tokenProvider *mocktoken.MockProvider) {
 				arg := db.GetGroupByOwnerAndIDParams{
 					Owner:   mockPayload.Username,
 					GroupID: randomGroupID,
 				}
-				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
+				tokenProvider.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupByOwnerAndID(gomock.Any(), arg).Times(1).Return(mockGroup, nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -42,12 +42,12 @@ func TestGetGroupAPI(t *testing.T) {
 			description:         "should return not found error when not exists",
 			authorizationHeader: validAuthorizationHeader,
 			routeParam:          fmt.Sprintf("/%d", randomGroupID),
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, tokenProvider *mocktoken.MockProvider) {
 				arg := db.GetGroupByOwnerAndIDParams{
 					Owner:   mockPayload.Username,
 					GroupID: randomGroupID,
 				}
-				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
+				tokenProvider.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupByOwnerAndID(gomock.Any(), arg).Times(1).Return(db.Group{}, sql.ErrNoRows)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -58,12 +58,12 @@ func TestGetGroupAPI(t *testing.T) {
 			description:         "should return internal error when db failed",
 			authorizationHeader: validAuthorizationHeader,
 			routeParam:          fmt.Sprintf("/%d", randomGroupID),
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
+			buildStabs: func(store *mockdb.MockStore, tokenProvider *mocktoken.MockProvider) {
 				arg := db.GetGroupByOwnerAndIDParams{
 					Owner:   mockPayload.Username,
 					GroupID: randomGroupID,
 				}
-				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
+				tokenProvider.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupByOwnerAndID(gomock.Any(), arg).Times(1).Return(db.Group{}, sql.ErrConnDone)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -74,8 +74,8 @@ func TestGetGroupAPI(t *testing.T) {
 			description:         "should return client error when given string instead of int",
 			authorizationHeader: validAuthorizationHeader,
 			routeParam:          "/asdfa",
-			buildStabs: func(store *mockdb.MockStore, maker *mockmaker.MockMaker) {
-				maker.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
+			buildStabs: func(store *mockdb.MockStore, tokenProvider *mocktoken.MockProvider) {
+				tokenProvider.EXPECT().VerifyToken(gomock.Any()).Times(1).Return(mockPayload, nil)
 				store.EXPECT().GetGroupByOwnerAndID(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -88,7 +88,7 @@ func TestGetGroupAPI(t *testing.T) {
 		t.Run(tC.description, func(t *testing.T) {
 			// mocks
 			ctrl := gomock.NewController(t)
-			mockMaker := mockmaker.NewMockMaker(ctrl)
+			mockMaker := mocktoken.NewMockProvider(ctrl)
 			mockStore := mockdb.NewMockStore(ctrl)
 
 			// stabs

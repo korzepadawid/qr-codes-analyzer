@@ -15,11 +15,11 @@ const (
 
 type authHandler struct {
 	store          db.Store
-	tokenMaker     token.Maker
-	passwordHasher util.Hasher
+	tokenMaker     token.Provider
+	passwordHasher util.PasswordService
 }
 
-func NewAuthHandler(store db.Store, tokenService token.Maker, hasher util.Hasher) *authHandler {
+func NewAuthHandler(store db.Store, tokenService token.Provider, hasher util.PasswordService) *authHandler {
 	return &authHandler{
 		store:          store,
 		tokenMaker:     tokenService,

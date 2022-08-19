@@ -8,15 +8,17 @@ import (
 )
 
 func (h *groupHandler) deleteGroup(ctx *gin.Context) {
-	groupID, ok := GetGroupIDFromParams(ctx)
+	groupID, err := GetGroupIDFromParams(ctx)
 
-	if !ok {
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 
-	owner, ok := auth.GetCurrentUserUsername(ctx)
+	owner, err := auth.GetCurrentUserUsername(ctx)
 
-	if !ok {
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 
@@ -25,9 +27,7 @@ func (h *groupHandler) deleteGroup(ctx *gin.Context) {
 		Owner:   owner,
 	}
 
-	err := h.store.DeleteGroupByOwnerAndID(ctx, arg)
-
-	if err != nil {
+	if err := h.store.DeleteGroupByOwnerAndID(ctx, arg); err != nil {
 		ctx.Error(err)
 		return
 	}
