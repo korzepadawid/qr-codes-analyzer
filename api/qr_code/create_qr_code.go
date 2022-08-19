@@ -16,9 +16,8 @@ import (
 	"time"
 )
 
-// todo: add url validation
 type createQRCodeRequest struct {
-	URL         string `json:"url,omitempty" binding:"required"`
+	URL         string `json:"url,omitempty" binding:"required,url"`
 	Title       string `json:"title,omitempty" binding:"required,max=255"`
 	Description string `json:"description,omitempty" binding:"max=255"`
 }
@@ -87,7 +86,6 @@ func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {
 		return
 	}
 
-	// use any cache provider to cache uuid -> redirection-url
 	ctx.JSON(http.StatusCreated, newCreateQRCodeResponse(QRCode))
 }
 

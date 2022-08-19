@@ -9,8 +9,10 @@ import (
 )
 
 const (
-	routePrefix          = "/qr-codes"
-	routePrefixWithGroup = "/groups/:group_id/qr-codes"
+	notFoundPageTemplateName = "not_found.html"
+	routePrefix              = "/qr-codes/:uuid"
+	routeRedirect            = "/qr-codes/:uuid/redirect"
+	routePrefixWithGroup     = "/groups/:group_id/qr-codes"
 )
 
 type qrCodeHandler struct {
@@ -21,7 +23,13 @@ type qrCodeHandler struct {
 	qrCodeEncoder encode.Encoder
 }
 
-func NewQRCodeHandler(store db.Store, config config.Config, fileStorage storage.FileStorage, qrCodeEncoder encode.Encoder, middlewares ...gin.HandlerFunc) *qrCodeHandler {
+func NewQRCodeHandler(
+	store db.Store,
+	config config.Config,
+	fileStorage storage.FileStorage,
+	qrCodeEncoder encode.Encoder,
+	middlewares ...gin.HandlerFunc,
+) *qrCodeHandler {
 	return &qrCodeHandler{
 		config:        config,
 		store:         store,
@@ -32,6 +40,7 @@ func NewQRCodeHandler(store db.Store, config config.Config, fileStorage storage.
 }
 
 func (h qrCodeHandler) RegisterRoutes(r *gin.Engine) {
+	r.GET(routeRedirect, h.qrCodeRedirect) // the redirect route is publicly accessible
 	r.Use(h.middlewares...)
 	r.POST(routePrefixWithGroup, h.createQRCode)
 }

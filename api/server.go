@@ -2,6 +2,8 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/korzepadawid/qr-codes-analyzer/api/auth"
 	"github.com/korzepadawid/qr-codes-analyzer/api/common"
 	"github.com/korzepadawid/qr-codes-analyzer/api/errors"
@@ -13,7 +15,9 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
 	"github.com/korzepadawid/qr-codes-analyzer/util"
+	"github.com/korzepadawid/qr-codes-analyzer/valid"
 	"go.uber.org/zap"
+	"log"
 )
 
 type Server struct {
@@ -48,6 +52,17 @@ func NewServer(
 
 	// setup gin
 	gin.SetMode(gin.DebugMode)
+
+	// html templates
+	server.Router.LoadHTMLGlob("./templates/*.html")
+
+	// additional validators
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		err := v.RegisterValidation("url", valid.URL)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	// setup logger
 	logger, _ := zap.NewProduction()

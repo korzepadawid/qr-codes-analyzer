@@ -17,6 +17,7 @@ type Querier interface {
 	GetGroupByOwnerAndIDForUpdate(ctx context.Context, arg GetGroupByOwnerAndIDForUpdateParams) (Group, error)
 	GetGroupsByOwner(ctx context.Context, arg GetGroupsByOwnerParams) ([]Group, error)
 	GetGroupsCountByOwner(ctx context.Context, owner string) (int64, error)
+	GetQRCode(ctx context.Context, uuid string) (QrCode, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUsernameOrEmailParams) (User, error)
