@@ -14,16 +14,16 @@ const (
 )
 
 type authHandler struct {
-	store          db.Store
-	tokenMaker     token.Provider
-	passwordHasher util.PasswordService
+	store db.Store
+	token token.Provider
+	pass  util.PasswordService
 }
 
 func NewAuthHandler(store db.Store, tokenService token.Provider, hasher util.PasswordService) *authHandler {
 	return &authHandler{
-		store:          store,
-		tokenMaker:     tokenService,
-		passwordHasher: hasher,
+		store: store,
+		token: tokenService,
+		pass:  hasher,
 	}
 }
 

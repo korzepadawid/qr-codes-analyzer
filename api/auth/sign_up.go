@@ -39,7 +39,7 @@ func (h *authHandler) signUp(ctx *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := h.passwordHasher.HashPassword(request.Password)
+	hashedPassword, err := h.pass.HashPassword(request.Password)
 
 	if err != nil {
 		ctx.Error(err)

@@ -25,12 +25,12 @@ type createQRCodeRequest struct {
 
 type createQRCodeResponse struct {
 	UUID           string    `json:"uuid,omitempty"`
-	UsagesCount    int64     `json:"usages_count,omitempty" json:"usages_count,omitempty"`
-	RedirectionURL string    `json:"redirection_url,omitempty" json:"redirection_url,omitempty"`
-	Title          string    `json:"title,omitempty" json:"title,omitempty"`
-	Description    string    `json:"description,omitempty" json:"description,omitempty"`
-	QRCodeImageURL string    `json:"qr_code_image_url,omitempty" json:"qr_code_image_url,omitempty"`
-	CreatedAt      time.Time `json:"created_at" json:"created_at"`
+	UsagesCount    int64     `json:"usages_count,omitempty"`
+	RedirectionURL string    `json:"redirection_url,omitempty"`
+	Title          string    `json:"title,omitempty"`
+	Description    string    `json:"description,omitempty"`
+	QRCodeImageURL string    `json:"qr_code_image_url,omitempty"`
+	CreatedAt      time.Time `json:"created_at"`
 }
 
 func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {

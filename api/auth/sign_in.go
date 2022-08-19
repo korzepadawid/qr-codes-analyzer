@@ -45,14 +45,14 @@ func (h *authHandler) signIn(ctx *gin.Context) {
 		return
 	}
 
-	err := h.passwordHasher.VerifyPassword(user.Password, request.Password)
+	err := h.pass.VerifyPassword(user.Password, request.Password)
 
 	if err != nil {
 		ctx.Error(errors.ErrInvalidCredentials)
 		return
 	}
 
-	token, err := h.tokenMaker.CreateToken(user.Username)
+	token, err := h.token.CreateToken(user.Username)
 
 	if err != nil {
 		ctx.Error(err)
