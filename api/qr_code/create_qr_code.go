@@ -8,7 +8,6 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/api/auth"
 	"github.com/korzepadawid/qr-codes-analyzer/api/errors"
 	"github.com/korzepadawid/qr-codes-analyzer/api/group"
-	"github.com/korzepadawid/qr-codes-analyzer/cache"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"log"
@@ -87,17 +86,7 @@ func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {
 		return
 	}
 
-	go func() {
-		cacheErr := h.cache.Set(&cache.SetParams{
-			Key:      keyUUID,
-			Value:    QRCode.RedirectionUrl,
-			Duration: time.Minute * 2,
-		})
-
-		if cacheErr != nil {
-			panic(cacheErr)
-		}
-	}()
+	go h.cacheQRCode(keyUUID, request.URL)
 
 	ctx.JSON(http.StatusCreated, newCreateQRCodeResponse(QRCode))
 }

@@ -29,6 +29,8 @@ func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
 		return
 	}
 
+	go h.cacheQRCode(qrCode.Uuid, qrCode.RedirectionUrl)
+
 	// todo: save redirect to db in a separated goroutine
 	ctx.Redirect(http.StatusPermanentRedirect, qrCode.RedirectionUrl)
 }
