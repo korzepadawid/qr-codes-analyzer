@@ -8,7 +8,7 @@ const (
 )
 
 type PutFileParams struct {
-	Object      *[]byte
+	Object      []byte
 	StorageKey  string
 	ContentType string
 }

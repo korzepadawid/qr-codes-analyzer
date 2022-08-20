@@ -11,7 +11,7 @@ func (fs *AWSS3FileStorage) PutFile(ctx context.Context, params PutFileParams) e
 	putObjectParams := s3.PutObjectInput{
 		Bucket:      aws.String(fs.bucketName),
 		Key:         aws.String(params.StorageKey),
-		Body:        bytes.NewReader(*params.Object),
+		Body:        bytes.NewReader(params.Object),
 		ContentType: aws.String(params.ContentType),
 	}
 

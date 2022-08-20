@@ -24,3 +24,12 @@ mock-token:
 
 mock-password:
 	mockgen --build_flags=--mod=mod -package mockpassword -destination util/mock/password.go github.com/korzepadawid/qr-codes-analyzer/util PasswordService
+
+mock-cache:
+	mockgen --build_flags=--mod=mod -package mockcache -destination cache/mock/cache.go github.com/korzepadawid/qr-codes-analyzer/cache Cache
+
+mock-storage:
+	mockgen --build_flags=--mod=mod -package mockstorage -destination storage/mock/storage.go github.com/korzepadawid/qr-codes-analyzer/storage FileStorage
+
+mock-encoder:
+	mockgen --build_flags=--mod=mod -package mockencoder -destination encode/mock/encoder.go github.com/korzepadawid/qr-codes-analyzer/encode Encoder

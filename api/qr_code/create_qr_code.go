@@ -34,21 +34,18 @@ type createQRCodeResponse struct {
 
 func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {
 	var request createQRCodeRequest
-
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.Error(err)
 		return
 	}
 
 	owner, err := auth.GetCurrentUserUsername(ctx)
-
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
 	groupID, err := group.GetGroupIDFromParams(ctx)
-
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -59,41 +56,34 @@ func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {
 		return
 	}
 
-	keyUUID := uuid.NewString() // PK
-
-	// generates QRCode to the redirect url
-	qrCode, err := h.generateQRCode(keyUUID)
-
+	primaryKey := uuid.NewString()              // PK
+	qrCode, err := h.generateQRCode(primaryKey) // generates QRCode to the redirect url
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	storageKeyWithFileExtension, err := h.putQRCodeImageToFileStorage(ctx, keyUUID, qrCode)
-
+	storageKeyWithFileExtension, err := h.putQRCodeImageToFileStorage(ctx, primaryKey, qrCode)
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	createQRCodeArgs := h.newCreateQRCodeParams(owner, groupID, request, storageKeyWithFileExtension, keyUUID)
-
+	createQRCodeArgs := h.newCreateQRCodeParams(owner, groupID, request, storageKeyWithFileExtension, primaryKey)
 	QRCode, err := h.store.CreateQRCode(ctx, createQRCodeArgs)
-
 	if err != nil {
 		go h.deleteFile(ctx, storageKeyWithFileExtension)
 		ctx.Error(err)
 		return
 	}
 
-	go h.cacheQRCode(keyUUID, request.URL)
-
+	go h.cacheQRCode(QRCode.Uuid, QRCode.RedirectionUrl)
 	ctx.JSON(http.StatusCreated, newCreateQRCodeResponse(QRCode))
 }
 
 func (h *qrCodeHandler) deleteFile(ctx *gin.Context, storageKeyWithFileExtension string) {
-	if dErr := h.storage.DeleteFile(ctx, storageKeyWithFileExtension); dErr != nil {
-		log.Println(dErr)
+	if err := h.storage.DeleteFile(ctx, storageKeyWithFileExtension); err != nil {
+		log.Println(err)
 	}
 }
 
@@ -122,7 +112,7 @@ func newCreateQRCodeResponse(qrCode db.QrCode) createQRCodeResponse {
 	}
 }
 
-func (h qrCodeHandler) putQRCodeImageToFileStorage(ctx *gin.Context, uuid string, qrCode *[]byte) (string, error) {
+func (h qrCodeHandler) putQRCodeImageToFileStorage(ctx *gin.Context, uuid string, qrCode []byte) (string, error) {
 	storageKeyWithFileExtension := uuid + storage.ImageExt
 
 	putFileParams := storage.PutFileParams{
@@ -140,14 +130,14 @@ func (h qrCodeHandler) putQRCodeImageToFileStorage(ctx *gin.Context, uuid string
 	return storageKeyWithFileExtension, nil
 }
 
-func (h qrCodeHandler) generateQRCode(uuid string) (*[]byte, error) {
+func (h qrCodeHandler) generateQRCode(uuid string) ([]byte, error) {
 	qrCode, err := h.qrCodeEncoder.Encode(fmt.Sprintf("%s/encode-codes/%s/redirect", h.config.AppURL, uuid))
 
 	if err != nil {
-		return &[]byte{}, errors.ErrQRCodeGenerationFailed
+		return make([]byte, 0), errors.ErrQRCodeGenerationFailed
 	}
 
-	return &qrCode, nil
+	return qrCode, nil
 }
 
 func (h qrCodeHandler) groupExists(ctx *gin.Context, owner string, groupID int64) error {
