@@ -14,6 +14,7 @@ type Querier interface {
 	CreateRedirect(ctx context.Context, arg CreateRedirectParams) (Redirect, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteGroupByOwnerAndID(ctx context.Context, arg DeleteGroupByOwnerAndIDParams) error
+	DeleteQRCode(ctx context.Context, arg DeleteQRCodeParams) error
 	GetGroupByOwnerAndID(ctx context.Context, arg GetGroupByOwnerAndIDParams) (Group, error)
 	GetGroupByOwnerAndIDForUpdate(ctx context.Context, arg GetGroupByOwnerAndIDForUpdateParams) (Group, error)
 	GetGroupsByOwner(ctx context.Context, arg GetGroupsByOwnerParams) ([]Group, error)

@@ -20,3 +20,7 @@ LIMIT 1 FOR NO KEY UPDATE;
 UPDATE qr_codes
 SET usages_count = usages_count + 1
 WHERE uuid = sqlc.arg(UUID);
+
+-- name: DeleteQRCode :exec
+DELETE FROM qr_codes
+WHERE uuid = sqlc.arg(UUID) AND owner = sqlc.arg(owner);

@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// todo: delete qr codes from the file storage
 func (h *groupHandler) deleteGroup(ctx *gin.Context) {
 	groupID, err := GetGroupIDFromParams(ctx)
 

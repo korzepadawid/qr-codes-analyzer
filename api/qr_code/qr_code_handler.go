@@ -47,4 +47,5 @@ func (h qrCodeHandler) RegisterRoutes(r *gin.Engine) {
 	r.GET(routeRedirect, h.qrCodeRedirect) // the redirect route is publicly accessible
 	r.Use(h.middlewares...)
 	r.POST(routePrefixWithGroup, h.createQRCode)
+	r.DELETE(routePrefix, h.deleteQRCode)
 }

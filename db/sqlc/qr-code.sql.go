@@ -51,6 +51,21 @@ func (q *Queries) CreateQRCode(ctx context.Context, arg CreateQRCodeParams) (QrC
 	return i, err
 }
 
+const deleteQRCode = `-- name: DeleteQRCode :exec
+DELETE FROM qr_codes
+WHERE uuid = $1 AND owner = $2
+`
+
+type DeleteQRCodeParams struct {
+	Uuid  string `json:"uuid"`
+	Owner string `json:"owner"`
+}
+
+func (q *Queries) DeleteQRCode(ctx context.Context, arg DeleteQRCodeParams) error {
+	_, err := q.db.ExecContext(ctx, deleteQRCode, arg.Uuid, arg.Owner)
+	return err
+}
+
 const getQRCode = `-- name: GetQRCode :one
 SELECT uuid, owner, group_id, usages_count, redirection_url, title, description, storage_url, created_at
 FROM qr_codes

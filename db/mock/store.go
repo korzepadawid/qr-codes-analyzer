@@ -108,6 +108,20 @@ func (mr *MockStoreMockRecorder) DeleteGroupByOwnerAndID(arg0, arg1 interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteGroupByOwnerAndID", reflect.TypeOf((*MockStore)(nil).DeleteGroupByOwnerAndID), arg0, arg1)
 }
 
+// DeleteQRCode mocks base method
+func (m *MockStore) DeleteQRCode(arg0 context.Context, arg1 sqlc.DeleteQRCodeParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteQRCode", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteQRCode indicates an expected call of DeleteQRCode
+func (mr *MockStoreMockRecorder) DeleteQRCode(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteQRCode", reflect.TypeOf((*MockStore)(nil).DeleteQRCode), arg0, arg1)
+}
+
 // GetGroupByOwnerAndID mocks base method
 func (m *MockStore) GetGroupByOwnerAndID(arg0 context.Context, arg1 sqlc.GetGroupByOwnerAndIDParams) (sqlc.Group, error) {
 	m.ctrl.T.Helper()
