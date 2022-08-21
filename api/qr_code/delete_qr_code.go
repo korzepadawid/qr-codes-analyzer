@@ -12,6 +12,12 @@ import (
 
 func (h *qrCodeHandler) deleteQRCode(ctx *gin.Context) {
 	uuid := strings.TrimSpace(ctx.Param(paramNameUUID))
+
+	if len(uuid) == 0 {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+
 	owner, err := auth.GetCurrentUserUsername(ctx)
 	if err != nil {
 		ctx.Error(err)

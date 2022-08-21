@@ -54,6 +54,18 @@ func TestDeleteQRCodeAPI(t *testing.T) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
+		{
+			description: "should return an error when empty uuid",
+			qrCodeUUID:  "            ",
+			buildStabs: func(store *mockdb.MockStore, tokenProvider *mocktoken.MockProvider, storage *mockstorage.MockFileStorage) {
+				tokenProvider.EXPECT().VerifyToken(gomock.Any()).Return(mockPayload, nil)
+				store.EXPECT().DeleteQRCode(gomock.Any(), gomock.Any()).Times(0)
+				storage.EXPECT().DeleteFile(gomock.Any(), gomock.Eq(".png")).Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
 	}
 
 	for _, tC := range testCases {
