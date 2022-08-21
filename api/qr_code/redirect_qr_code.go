@@ -4,14 +4,20 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 const paramNameUUID = "uuid"
 
 func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
-	uuid := ctx.Param(paramNameUUID)
+	uuid := strings.TrimSpace(ctx.Param(paramNameUUID))
 
-	v, err := h.cache.Get(paramNameUUID)
+	if len(uuid) == 0 {
+		ctx.HTML(http.StatusNotFound, notFoundPageTemplateName, gin.H{})
+		return
+	}
+
+	v, err := h.cache.Get(uuid)
 
 	if err == nil {
 		ctx.Redirect(http.StatusPermanentRedirect, v)
@@ -31,6 +37,6 @@ func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
 
 	go h.cacheQRCode(qrCode.Uuid, qrCode.RedirectionUrl)
 
-	// todo: save redirect to db in a separated goroutine
+	// todo : save redirect to db in a separated goroutine and increase
 	ctx.Redirect(http.StatusPermanentRedirect, qrCode.RedirectionUrl)
 }

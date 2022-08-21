@@ -56,23 +56,23 @@ func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {
 		return
 	}
 
-	primaryKey := uuid.NewString()              // PK
-	qrCode, err := h.generateQRCode(primaryKey) // generates QRCode to the redirect url
+	qrCodeUUID := uuid.NewString()              // PK
+	qrCode, err := h.generateQRCode(qrCodeUUID) // generates QRCode to the redirect url
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	storageKeyWithFileExtension, err := h.putQRCodeImageToFileStorage(ctx, primaryKey, qrCode)
+	storageKey, err := h.putQRCodeImageIntoFileStorage(ctx, qrCodeUUID, qrCode)
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	createQRCodeArgs := h.newCreateQRCodeParams(owner, groupID, request, storageKeyWithFileExtension, primaryKey)
+	createQRCodeArgs := h.newCreateQRCodeParams(owner, groupID, request, storageKey, qrCodeUUID)
 	QRCode, err := h.store.CreateQRCode(ctx, createQRCodeArgs)
 	if err != nil {
-		go h.deleteFile(ctx, storageKeyWithFileExtension)
+		go h.deleteFile(ctx, storageKey)
 		ctx.Error(err)
 		return
 	}
@@ -87,7 +87,7 @@ func (h *qrCodeHandler) deleteFile(ctx *gin.Context, storageKeyWithFileExtension
 	}
 }
 
-func (h *qrCodeHandler) newCreateQRCodeParams(owner string, groupID int64, request createQRCodeRequest, storageKeyWithFileExtension string, keyUUID string) db.CreateQRCodeParams {
+func (h *qrCodeHandler) newCreateQRCodeParams(owner string, groupID int64, request createQRCodeRequest, storageKeyWithFileExtension string, qrCodeUUID string) db.CreateQRCodeParams {
 	createQRCodeArgs := db.CreateQRCodeParams{
 		Owner:          owner,
 		GroupID:        groupID,
@@ -95,7 +95,7 @@ func (h *qrCodeHandler) newCreateQRCodeParams(owner string, groupID int64, reque
 		Title:          strings.TrimSpace(request.Title),
 		Description:    strings.TrimSpace(request.Description),
 		StorageUrl:     h.config.CDNAddress + storageKeyWithFileExtension,
-		Uuid:           keyUUID,
+		Uuid:           qrCodeUUID,
 	}
 	return createQRCodeArgs
 }
@@ -112,8 +112,8 @@ func newCreateQRCodeResponse(qrCode db.QrCode) createQRCodeResponse {
 	}
 }
 
-func (h qrCodeHandler) putQRCodeImageToFileStorage(ctx *gin.Context, uuid string, qrCode []byte) (string, error) {
-	storageKeyWithFileExtension := uuid + storage.ImageExt
+func (h qrCodeHandler) putQRCodeImageIntoFileStorage(ctx *gin.Context, qrCodeUUID string, qrCode []byte) (string, error) {
+	storageKeyWithFileExtension := qrCodeUUID + storage.ImageExt
 
 	putFileParams := storage.PutFileParams{
 		Object:      qrCode,
@@ -130,8 +130,8 @@ func (h qrCodeHandler) putQRCodeImageToFileStorage(ctx *gin.Context, uuid string
 	return storageKeyWithFileExtension, nil
 }
 
-func (h qrCodeHandler) generateQRCode(uuid string) ([]byte, error) {
-	qrCode, err := h.qrCodeEncoder.Encode(fmt.Sprintf("%s/encode-codes/%s/redirect", h.config.AppURL, uuid))
+func (h qrCodeHandler) generateQRCode(qrCodeUUID string) ([]byte, error) {
+	qrCode, err := h.qrCodeEncoder.Encode(fmt.Sprintf("%s/encode-codes/%s/redirect", h.config.AppURL, qrCodeUUID))
 
 	if err != nil {
 		return make([]byte, 0), errors.ErrQRCodeGenerationFailed

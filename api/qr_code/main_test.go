@@ -55,6 +55,7 @@ func newMockQRCodeHandler(
 ) *gin.Engine {
 	r := gin.Default()
 	common.SetUpErrorHandler(r)
+	r.LoadHTMLGlob("../../templates/*.html")
 	h := NewQRCodeHandler(store, config, fileStorage, qrCodeEncoder, cache, auth.SecureRoute(tokenProvider))
 	h.RegisterRoutes(r)
 	return r
