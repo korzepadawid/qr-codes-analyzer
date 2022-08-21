@@ -64,6 +64,21 @@ func (mr *MockStoreMockRecorder) CreateQRCode(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateQRCode", reflect.TypeOf((*MockStore)(nil).CreateQRCode), arg0, arg1)
 }
 
+// CreateRedirect mocks base method
+func (m *MockStore) CreateRedirect(arg0 context.Context, arg1 sqlc.CreateRedirectParams) (sqlc.Redirect, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRedirect", arg0, arg1)
+	ret0, _ := ret[0].(sqlc.Redirect)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRedirect indicates an expected call of CreateRedirect
+func (mr *MockStoreMockRecorder) CreateRedirect(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRedirect", reflect.TypeOf((*MockStore)(nil).CreateRedirect), arg0, arg1)
+}
+
 // CreateUser mocks base method
 func (m *MockStore) CreateUser(arg0 context.Context, arg1 sqlc.CreateUserParams) (sqlc.User, error) {
 	m.ctrl.T.Helper()
@@ -168,6 +183,21 @@ func (mr *MockStoreMockRecorder) GetQRCode(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQRCode", reflect.TypeOf((*MockStore)(nil).GetQRCode), arg0, arg1)
 }
 
+// GetQRCodeForUpdate mocks base method
+func (m *MockStore) GetQRCodeForUpdate(arg0 context.Context, arg1 string) (sqlc.QrCode, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetQRCodeForUpdate", arg0, arg1)
+	ret0, _ := ret[0].(sqlc.QrCode)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetQRCodeForUpdate indicates an expected call of GetQRCodeForUpdate
+func (mr *MockStoreMockRecorder) GetQRCodeForUpdate(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQRCodeForUpdate", reflect.TypeOf((*MockStore)(nil).GetQRCodeForUpdate), arg0, arg1)
+}
+
 // GetUserByEmail mocks base method
 func (m *MockStore) GetUserByEmail(arg0 context.Context, arg1 string) (sqlc.User, error) {
 	m.ctrl.T.Helper()
@@ -211,6 +241,34 @@ func (m *MockStore) GetUserByUsernameOrEmail(arg0 context.Context, arg1 sqlc.Get
 func (mr *MockStoreMockRecorder) GetUserByUsernameOrEmail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByUsernameOrEmail", reflect.TypeOf((*MockStore)(nil).GetUserByUsernameOrEmail), arg0, arg1)
+}
+
+// IncrementQRCodeEntries mocks base method
+func (m *MockStore) IncrementQRCodeEntries(arg0 context.Context, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IncrementQRCodeEntries", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// IncrementQRCodeEntries indicates an expected call of IncrementQRCodeEntries
+func (mr *MockStoreMockRecorder) IncrementQRCodeEntries(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncrementQRCodeEntries", reflect.TypeOf((*MockStore)(nil).IncrementQRCodeEntries), arg0, arg1)
+}
+
+// IncrementRedirectEntriesTx mocks base method
+func (m *MockStore) IncrementRedirectEntriesTx(arg0 context.Context, arg1 sqlc.IncrementRedirectEntriesTxParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IncrementRedirectEntriesTx", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// IncrementRedirectEntriesTx indicates an expected call of IncrementRedirectEntriesTx
+func (mr *MockStoreMockRecorder) IncrementRedirectEntriesTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncrementRedirectEntriesTx", reflect.TypeOf((*MockStore)(nil).IncrementRedirectEntriesTx), arg0, arg1)
 }
 
 // UpdateGroupByOwnerAndID mocks base method

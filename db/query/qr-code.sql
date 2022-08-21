@@ -9,3 +9,14 @@ SELECT *
 FROM qr_codes
 WHERE uuid = sqlc.arg(UUID)
 LIMIT 1;
+
+-- name: GetQRCodeForUpdate :one
+SELECT *
+FROM qr_codes
+WHERE uuid = sqlc.arg(UUID)
+LIMIT 1 FOR NO KEY UPDATE;
+
+-- name: IncrementQRCodeEntries :exec
+UPDATE qr_codes
+SET usages_count = usages_count + 1
+WHERE uuid = sqlc.arg(UUID);

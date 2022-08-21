@@ -29,13 +29,16 @@ type QrCode struct {
 }
 
 type Redirect struct {
-	ID         int64     `json:"id"`
-	QrCodeUuid string    `json:"qr_code_uuid"`
-	Ipv4       string    `json:"ipv4"`
-	Isp        string    `json:"isp"`
-	State      string    `json:"state"`
-	Country    string    `json:"country"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID            int64     `json:"id"`
+	QrCodeUuid    string    `json:"qr_code_uuid"`
+	Ipv4          string    `json:"ipv4"`
+	Isp           string    `json:"isp"`
+	AutonomousSys string    `json:"autonomous_sys"`
+	Lat           string    `json:"lat"`
+	Lon           string    `json:"lon"`
+	City          string    `json:"city"`
+	Country       string    `json:"country"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 type User struct {

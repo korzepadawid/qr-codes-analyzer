@@ -74,3 +74,38 @@ func (q *Queries) GetQRCode(ctx context.Context, uuid string) (QrCode, error) {
 	)
 	return i, err
 }
+
+const getQRCodeForUpdate = `-- name: GetQRCodeForUpdate :one
+SELECT uuid, owner, group_id, usages_count, redirection_url, title, description, storage_url, created_at
+FROM qr_codes
+WHERE uuid = $1
+LIMIT 1 FOR NO KEY UPDATE
+`
+
+func (q *Queries) GetQRCodeForUpdate(ctx context.Context, uuid string) (QrCode, error) {
+	row := q.db.QueryRowContext(ctx, getQRCodeForUpdate, uuid)
+	var i QrCode
+	err := row.Scan(
+		&i.Uuid,
+		&i.Owner,
+		&i.GroupID,
+		&i.UsagesCount,
+		&i.RedirectionUrl,
+		&i.Title,
+		&i.Description,
+		&i.StorageUrl,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const incrementQRCodeEntries = `-- name: IncrementQRCodeEntries :exec
+UPDATE qr_codes
+SET usages_count = usages_count + 1
+WHERE uuid = $1
+`
+
+func (q *Queries) IncrementQRCodeEntries(ctx context.Context, uuid string) error {
+	_, err := q.db.ExecContext(ctx, incrementQRCodeEntries, uuid)
+	return err
+}

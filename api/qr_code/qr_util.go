@@ -5,10 +5,10 @@ import (
 	"time"
 )
 
-func (h *qrCodeHandler) cacheQRCode(uuid, url string) {
+func (h *qrCodeHandler) cacheQRCode(key, value string) {
 	params := cache.SetParams{
-		Key:      uuid,
-		Value:    url,
+		Key:      key,
+		Value:    value,
 		Duration: time.Minute * 2,
 	}
 

@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"fmt"
+	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
 )
 
 type UpdateGroupTxParams struct {
@@ -11,9 +13,17 @@ type UpdateGroupTxParams struct {
 	ID          int64
 }
 
+type IncrementRedirectEntriesTxParams struct {
+	UUID      string
+	IPv4      string
+	IPDetails *ipapi.IPDetails
+}
+
 // Transactor contains method signatures of db transactions
 type Transactor interface {
 	UpdateGroupTx(context.Context, UpdateGroupTxParams) (Group, error)
+
+	IncrementRedirectEntriesTx(context.Context, IncrementRedirectEntriesTxParams) error
 }
 
 func (s *SQLStore) UpdateGroupTx(ctx context.Context, params UpdateGroupTxParams) (Group, error) {
@@ -59,4 +69,29 @@ func createUpdateArgs(group Group, params UpdateGroupTxParams) UpdateGroupByOwne
 	}
 
 	return updateArg
+}
+
+func (s *SQLStore) IncrementRedirectEntriesTx(ctx context.Context, params IncrementRedirectEntriesTxParams) error {
+	return s.execTx(ctx, func(queries *Queries) error {
+		if err := queries.IncrementQRCodeEntries(ctx, params.UUID); err != nil {
+			return err
+		}
+
+		_, err := queries.CreateRedirect(ctx, CreateRedirectParams{
+			QrCodeUuid:    params.UUID,
+			Ipv4:          params.IPv4,
+			Isp:           params.IPDetails.ISP,
+			AutonomousSys: params.IPDetails.AS,
+			Lat:           fmt.Sprintf("%9.5f", params.IPDetails.Lat),
+			Lon:           fmt.Sprintf("%9.5f", params.IPDetails.Lon),
+			City:          params.IPDetails.City,
+			Country:       params.IPDetails.Country,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

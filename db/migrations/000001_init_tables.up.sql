@@ -31,13 +31,16 @@ CREATE TABLE "qr_codes"
 
 CREATE TABLE "redirects"
 (
-    "id"           bigserial PRIMARY KEY NOT NULL,
-    "qr_code_uuid" varchar               NOT NULL,
-    "ipv4"         varchar               NOT NULL default '',
-    "isp"          varchar               NOT NULL default '',
-    "state"        varchar               NOT NULL default '',
-    "country"      varchar               NOT NULL default '',
-    "created_at"   timestamptz           NOT NULL DEFAULT (now())
+    "id"             bigserial PRIMARY KEY NOT NULL,
+    "qr_code_uuid"   varchar               NOT NULL,
+    "ipv4"           varchar               NOT NULL default '',
+    "isp"            varchar               NOT NULL default '',
+    "autonomous_sys" varchar               NOT NULL default '',
+    "lat"            numeric(9, 5)         not null default .0,
+    "lon"            numeric(9, 5)         not null default .0,
+    "city"           varchar               NOT NULL default '',
+    "country"        varchar               NOT NULL default '',
+    "created_at"     timestamptz           NOT NULL DEFAULT (now())
 );
 
 CREATE INDEX ON "users" ("email");
