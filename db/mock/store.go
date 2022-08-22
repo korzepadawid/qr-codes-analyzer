@@ -212,6 +212,36 @@ func (mr *MockStoreMockRecorder) GetQRCodeForUpdate(arg0, arg1 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQRCodeForUpdate", reflect.TypeOf((*MockStore)(nil).GetQRCodeForUpdate), arg0, arg1)
 }
 
+// GetQRCodesCountByGroupAndOwner mocks base method
+func (m *MockStore) GetQRCodesCountByGroupAndOwner(arg0 context.Context, arg1 sqlc.GetQRCodesCountByGroupAndOwnerParams) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetQRCodesCountByGroupAndOwner", arg0, arg1)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetQRCodesCountByGroupAndOwner indicates an expected call of GetQRCodesCountByGroupAndOwner
+func (mr *MockStoreMockRecorder) GetQRCodesCountByGroupAndOwner(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQRCodesCountByGroupAndOwner", reflect.TypeOf((*MockStore)(nil).GetQRCodesCountByGroupAndOwner), arg0, arg1)
+}
+
+// GetQRCodesPageByGroupAndOwner mocks base method
+func (m *MockStore) GetQRCodesPageByGroupAndOwner(arg0 context.Context, arg1 sqlc.GetQRCodesPageByGroupAndOwnerParams) ([]sqlc.QrCode, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetQRCodesPageByGroupAndOwner", arg0, arg1)
+	ret0, _ := ret[0].([]sqlc.QrCode)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetQRCodesPageByGroupAndOwner indicates an expected call of GetQRCodesPageByGroupAndOwner
+func (mr *MockStoreMockRecorder) GetQRCodesPageByGroupAndOwner(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQRCodesPageByGroupAndOwner", reflect.TypeOf((*MockStore)(nil).GetQRCodesPageByGroupAndOwner), arg0, arg1)
+}
+
 // GetUserByEmail mocks base method
 func (m *MockStore) GetUserByEmail(arg0 context.Context, arg1 string) (sqlc.User, error) {
 	m.ctrl.T.Helper()

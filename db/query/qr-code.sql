@@ -22,5 +22,22 @@ SET usages_count = usages_count + 1
 WHERE uuid = sqlc.arg(UUID);
 
 -- name: DeleteQRCode :exec
-DELETE FROM qr_codes
-WHERE uuid = sqlc.arg(UUID) AND owner = sqlc.arg(owner);
+DELETE
+FROM qr_codes
+WHERE uuid = sqlc.arg(UUID)
+  AND owner = sqlc.arg(owner);
+
+-- name: GetQRCodesPageByGroupAndOwner :many
+SELECT qc.*
+FROM groups g
+         JOIN qr_codes qc on g.id = qc.group_id
+WHERE g.id = sqlc.arg(group_id)
+  AND g.owner = sqlc.arg(owner)
+LIMIT $1 OFFSET $2;
+
+-- name: GetQRCodesCountByGroupAndOwner :one
+SELECT COUNT(*)
+FROM groups g
+         JOIN qr_codes qc on g.id = qc.group_id
+WHERE g.id = sqlc.arg(group_id)
+  AND g.owner = sqlc.arg(owner);

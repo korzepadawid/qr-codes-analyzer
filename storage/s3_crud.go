@@ -14,9 +14,7 @@ func (fs *AWSS3FileStorage) PutFile(ctx context.Context, params PutFileParams) e
 		Body:        bytes.NewReader(params.Object),
 		ContentType: aws.String(params.ContentType),
 	}
-
 	_, err := fs.s3Client.PutObject(ctx, &putObjectParams, additionalOptions(fs))
-
 	return err
 }
 
@@ -25,9 +23,7 @@ func (fs *AWSS3FileStorage) DeleteFile(ctx context.Context, storageKey string) e
 		Bucket: aws.String(fs.bucketName),
 		Key:    aws.String(storageKey),
 	}
-
 	_, err := fs.s3Client.DeleteObject(ctx, &deleteObjectInput, additionalOptions(fs))
-
 	return err
 }
 

@@ -21,6 +21,8 @@ type Querier interface {
 	GetGroupsCountByOwner(ctx context.Context, owner string) (int64, error)
 	GetQRCode(ctx context.Context, uuid string) (QrCode, error)
 	GetQRCodeForUpdate(ctx context.Context, uuid string) (QrCode, error)
+	GetQRCodesCountByGroupAndOwner(ctx context.Context, arg GetQRCodesCountByGroupAndOwnerParams) (int64, error)
+	GetQRCodesPageByGroupAndOwner(ctx context.Context, arg GetQRCodesPageByGroupAndOwnerParams) ([]QrCode, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUsernameOrEmailParams) (User, error)

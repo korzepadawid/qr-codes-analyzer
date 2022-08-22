@@ -48,4 +48,5 @@ func (h qrCodeHandler) RegisterRoutes(r *gin.Engine) {
 	r.Use(h.middlewares...)
 	r.POST(routePrefixWithGroup, h.createQRCode)
 	r.DELETE(routePrefix, h.deleteQRCode)
+	r.GET(routePrefixWithGroup, h.getQRCodes)
 }

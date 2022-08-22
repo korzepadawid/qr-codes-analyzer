@@ -1,6 +1,8 @@
 package qr_code
 
 import (
+	"bytes"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/korzepadawid/qr-codes-analyzer/api/auth"
 	"github.com/korzepadawid/qr-codes-analyzer/api/common"
@@ -11,6 +13,8 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
 	"github.com/korzepadawid/qr-codes-analyzer/util"
+	"github.com/stretchr/testify/require"
+	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -59,6 +63,15 @@ func newMockQRCodeHandler(
 	h := NewQRCodeHandler(store, config, fileStorage, qrCodeEncoder, cache, auth.SecureRoute(tokenProvider))
 	h.RegisterRoutes(r)
 	return r
+}
+
+func parseQRCodePageResponse(t *testing.T, b *bytes.Buffer) common.PageResponse[db.QrCode] {
+	data, err := ioutil.ReadAll(b)
+	require.NoError(t, err)
+	var got common.PageResponse[db.QrCode]
+	err = json.Unmarshal(data, &got)
+	require.NoError(t, err)
+	return got
 }
 
 func TestMain(m *testing.M) {

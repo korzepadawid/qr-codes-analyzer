@@ -22,7 +22,7 @@ func GetPageOffset(pageNumber, itemsPerPage int32) int32 {
 
 func GetLastPage(totalElements int64, pageSize int32) int32 {
 	div := int32(totalElements) / pageSize
-	if int32(totalElements)%pageSize == 0 {
+	if totalElements != 0 && int32(totalElements)%pageSize == 0 {
 		return div
 	}
 	return div + 1

@@ -9,17 +9,14 @@ import (
 	"net/http"
 )
 
-// todo: implement getting count of encode-codes in the given group
 func (h *groupHandler) getGroup(ctx *gin.Context) {
 	groupID, err := GetGroupIDFromParams(ctx)
-
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
 	owner, err := auth.GetCurrentUserUsername(ctx)
-
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -29,9 +26,7 @@ func (h *groupHandler) getGroup(ctx *gin.Context) {
 		Owner:   owner,
 		GroupID: groupID,
 	}
-
 	group, err := h.store.GetGroupByOwnerAndID(ctx, arg)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.Error(errors.ErrGroupNotFound)
