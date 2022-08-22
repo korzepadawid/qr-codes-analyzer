@@ -24,6 +24,7 @@ func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
 
 	if err == nil {
 		go h.createRedirectEntry(ctx, uuid)
+		ctx.Header("Cache-Control", "no-store")
 		ctx.Redirect(http.StatusPermanentRedirect, v)
 		return
 	}
@@ -42,6 +43,7 @@ func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
 	go h.cacheQRCode(qrCode.Uuid, qrCode.RedirectionUrl)
 	go h.createRedirectEntry(ctx, qrCode.Uuid)
 
+	ctx.Header("Cache-Control", "no-store")
 	ctx.Redirect(http.StatusPermanentRedirect, qrCode.RedirectionUrl)
 }
 
