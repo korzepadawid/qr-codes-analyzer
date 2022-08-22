@@ -49,4 +49,5 @@ func (h qrCodeHandler) RegisterRoutes(r *gin.Engine) {
 	r.POST(routePrefixWithGroup, h.createQRCode)
 	r.DELETE(routePrefix, h.deleteQRCode)
 	r.GET(routePrefixWithGroup, h.getQRCodes)
+	r.GET(routePrefix+"/stats/csv", h.createQRCodeStatsCSV)
 }

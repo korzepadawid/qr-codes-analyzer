@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createRedirect = `-- name: CreateRedirect :one
@@ -52,4 +53,77 @@ func (q *Queries) CreateRedirect(ctx context.Context, arg CreateRedirectParams) 
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getQRCodeRedirectEntries = `-- name: GetQRCodeRedirectEntries :many
+SELECT qc.uuid            AS "uuid",
+       qc.redirection_url AS "url",
+       qc.title           AS "title",
+       r.ipv4             AS "ipv4",
+       r.isp              AS "isp",
+       r.autonomous_sys   AS "autonomous_sys",
+       r.city             AS "city",
+       r.lat              AS "lat",
+       r.lon              AS "lon",
+       r.country          AS "country",
+       r.created_at       AS "date"
+FROM qr_codes qc
+         INNER JOIN redirects r on qc.uuid = r.qr_code_uuid
+WHERE qc.uuid = $1
+  AND qc.owner = $2
+ORDER BY r.created_at DESC
+`
+
+type GetQRCodeRedirectEntriesParams struct {
+	Uuid  string `json:"uuid"`
+	Owner string `json:"owner"`
+}
+
+type GetQRCodeRedirectEntriesRow struct {
+	Uuid          string    `json:"uuid"`
+	Url           string    `json:"url"`
+	Title         string    `json:"title"`
+	Ipv4          string    `json:"ipv4"`
+	Isp           string    `json:"isp"`
+	AutonomousSys string    `json:"autonomous_sys"`
+	City          string    `json:"city"`
+	Lat           string    `json:"lat"`
+	Lon           string    `json:"lon"`
+	Country       string    `json:"country"`
+	Date          time.Time `json:"date"`
+}
+
+func (q *Queries) GetQRCodeRedirectEntries(ctx context.Context, arg GetQRCodeRedirectEntriesParams) ([]GetQRCodeRedirectEntriesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getQRCodeRedirectEntries, arg.Uuid, arg.Owner)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetQRCodeRedirectEntriesRow{}
+	for rows.Next() {
+		var i GetQRCodeRedirectEntriesRow
+		if err := rows.Scan(
+			&i.Uuid,
+			&i.Url,
+			&i.Title,
+			&i.Ipv4,
+			&i.Isp,
+			&i.AutonomousSys,
+			&i.City,
+			&i.Lat,
+			&i.Lon,
+			&i.Country,
+			&i.Date,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
