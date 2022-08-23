@@ -28,7 +28,7 @@ func (h *qrCodeHandler) saveRedirectWorker() {
 
 		if err != nil {
 			log.Println(err)
-			return
+			continue
 		}
 
 		arg := db.IncrementRedirectEntriesTxParams{
