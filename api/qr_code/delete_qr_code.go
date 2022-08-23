@@ -7,14 +7,12 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"log"
 	"net/http"
-	"strings"
 )
 
 func (h *qrCodeHandler) deleteQRCode(ctx *gin.Context) {
-	uuid := strings.TrimSpace(ctx.Param(paramNameUUID))
-
-	if len(uuid) == 0 {
-		ctx.Status(http.StatusBadRequest)
+	uuid, err := getQRCodeUUID(ctx)
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 

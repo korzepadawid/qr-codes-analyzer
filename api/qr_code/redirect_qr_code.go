@@ -7,15 +7,13 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
 	"log"
 	"net/http"
-	"strings"
 )
 
 const paramNameUUID = "uuid"
 
 func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
-	uuid := strings.TrimSpace(ctx.Param(paramNameUUID))
-
-	if len(uuid) == 0 {
+	uuid, err := getQRCodeUUID(ctx)
+	if err != nil {
 		ctx.HTML(http.StatusNotFound, notFoundPageTemplateName, gin.H{})
 		return
 	}

@@ -21,6 +21,7 @@ type Querier interface {
 	GetGroupsCountByOwner(ctx context.Context, owner string) (int64, error)
 	GetQRCode(ctx context.Context, uuid string) (QrCode, error)
 	GetQRCodeForUpdate(ctx context.Context, uuid string) (QrCode, error)
+	GetQRCodeForUpdateTitleAndDesc(ctx context.Context, arg GetQRCodeForUpdateTitleAndDescParams) (QrCode, error)
 	GetQRCodeRedirectEntries(ctx context.Context, arg GetQRCodeRedirectEntriesParams) ([]GetQRCodeRedirectEntriesRow, error)
 	GetQRCodesCountByGroupAndOwner(ctx context.Context, arg GetQRCodesCountByGroupAndOwnerParams) (int64, error)
 	GetQRCodesPageByGroupAndOwner(ctx context.Context, arg GetQRCodesPageByGroupAndOwnerParams) ([]QrCode, error)
@@ -29,6 +30,7 @@ type Querier interface {
 	GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUsernameOrEmailParams) (User, error)
 	IncrementQRCodeEntries(ctx context.Context, uuid string) error
 	UpdateGroupByOwnerAndID(ctx context.Context, arg UpdateGroupByOwnerAndIDParams) (Group, error)
+	UpdateQRCode(ctx context.Context, arg UpdateQRCodeParams) error
 }
 
 var _ Querier = (*Queries)(nil)

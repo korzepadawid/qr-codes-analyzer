@@ -9,7 +9,6 @@ import (
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 var (
@@ -17,9 +16,9 @@ var (
 )
 
 func (h *qrCodeHandler) createQRCodeStatsCSV(ctx *gin.Context) {
-	uuid := strings.TrimSpace(ctx.Param(paramNameUUID))
-	if len(uuid) == 0 {
-		ctx.Status(http.StatusBadRequest)
+	uuid, err := getQRCodeUUID(ctx)
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 

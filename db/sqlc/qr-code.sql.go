@@ -116,6 +116,36 @@ func (q *Queries) GetQRCodeForUpdate(ctx context.Context, uuid string) (QrCode, 
 	return i, err
 }
 
+const getQRCodeForUpdateTitleAndDesc = `-- name: GetQRCodeForUpdateTitleAndDesc :one
+SELECT uuid, owner, group_id, usages_count, redirection_url, title, description, storage_url, created_at
+FROM qr_codes
+WHERE uuid = $1
+  AND owner = $2
+LIMIT 1 FOR NO KEY UPDATE
+`
+
+type GetQRCodeForUpdateTitleAndDescParams struct {
+	Uuid  string `json:"uuid"`
+	Owner string `json:"owner"`
+}
+
+func (q *Queries) GetQRCodeForUpdateTitleAndDesc(ctx context.Context, arg GetQRCodeForUpdateTitleAndDescParams) (QrCode, error) {
+	row := q.db.QueryRowContext(ctx, getQRCodeForUpdateTitleAndDesc, arg.Uuid, arg.Owner)
+	var i QrCode
+	err := row.Scan(
+		&i.Uuid,
+		&i.Owner,
+		&i.GroupID,
+		&i.UsagesCount,
+		&i.RedirectionUrl,
+		&i.Title,
+		&i.Description,
+		&i.StorageUrl,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getQRCodesCountByGroupAndOwner = `-- name: GetQRCodesCountByGroupAndOwner :one
 SELECT COUNT(*)
 FROM groups g
@@ -198,5 +228,30 @@ WHERE uuid = $1
 
 func (q *Queries) IncrementQRCodeEntries(ctx context.Context, uuid string) error {
 	_, err := q.db.ExecContext(ctx, incrementQRCodeEntries, uuid)
+	return err
+}
+
+const updateQRCode = `-- name: UpdateQRCode :exec
+UPDATE qr_codes
+SET title       = $1,
+    description = $2
+WHERE uuid = $3
+  AND owner = $4
+`
+
+type UpdateQRCodeParams struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Uuid        string `json:"uuid"`
+	Owner       string `json:"owner"`
+}
+
+func (q *Queries) UpdateQRCode(ctx context.Context, arg UpdateQRCodeParams) error {
+	_, err := q.db.ExecContext(ctx, updateQRCode,
+		arg.Title,
+		arg.Description,
+		arg.Uuid,
+		arg.Owner,
+	)
 	return err
 }

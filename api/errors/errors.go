@@ -11,4 +11,6 @@ var (
 	ErrInvalidParamFormat         = errors.New("invalid param format")
 	ErrGroupNotFound              = errors.New("group not found")
 	ErrQRCodeGenerationFailed     = errors.New("failed to generate new encode code")
+	ErrQRCodeNotFound             = errors.New("qr code not found")
+	ErrQRCodeInvalidUUID          = errors.New("invalid uuid")
 )

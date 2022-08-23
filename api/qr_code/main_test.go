@@ -21,6 +21,10 @@ import (
 )
 
 var (
+	mockUpdateQRCodeRequest = UpdateQRCodeRequest{
+		Title:       util.RandomString(6),
+		Description: util.RandomString(6),
+	}
 	mockUsername  = util.RandomUsername()
 	mockPayload   = &token.Payload{Username: mockUsername}
 	randomGroupID = util.RandomInt64(1, 1000)

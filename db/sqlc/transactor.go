@@ -19,11 +19,20 @@ type IncrementRedirectEntriesTxParams struct {
 	IPDetails *ipapi.IPDetails
 }
 
+type UpdateQRCodeTxParams struct {
+	UUID        string
+	Owner       string
+	Title       string
+	Description string
+}
+
 // Transactor contains method signatures of db transactions
 type Transactor interface {
 	UpdateGroupTx(context.Context, UpdateGroupTxParams) (Group, error)
 
 	IncrementRedirectEntriesTx(context.Context, IncrementRedirectEntriesTxParams) error
+
+	UpdateQRCodeTx(context.Context, UpdateQRCodeTxParams) error
 }
 
 func (s *SQLStore) UpdateGroupTx(ctx context.Context, params UpdateGroupTxParams) (Group, error) {
@@ -93,5 +102,31 @@ func (s *SQLStore) IncrementRedirectEntriesTx(ctx context.Context, params Increm
 		}
 
 		return nil
+	})
+}
+
+func (s *SQLStore) UpdateQRCodeTx(ctx context.Context, params UpdateQRCodeTxParams) error {
+	return s.execTx(ctx, func(queries *Queries) error {
+		qr, err := queries.GetQRCodeForUpdateTitleAndDesc(ctx, GetQRCodeForUpdateTitleAndDescParams{
+			Uuid:  params.UUID,
+			Owner: params.Owner,
+		})
+		if err != nil {
+			return err
+		}
+
+		arg := UpdateQRCodeParams{
+			Title:       qr.Title,
+			Description: qr.Description,
+			Uuid:        params.UUID,
+			Owner:       params.Owner,
+		}
+		if len(params.Title) > 0 {
+			arg.Title = params.Title
+		}
+		if len(params.Description) > 0 {
+			arg.Description = params.Description
+		}
+		return queries.UpdateQRCode(ctx, arg)
 	})
 }

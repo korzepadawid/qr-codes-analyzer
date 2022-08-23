@@ -41,3 +41,17 @@ FROM groups g
          JOIN qr_codes qc on g.id = qc.group_id
 WHERE g.id = sqlc.arg(group_id)
   AND g.owner = sqlc.arg(owner);
+
+-- name: UpdateQRCode :exec
+UPDATE qr_codes
+SET title       = $1,
+    description = $2
+WHERE uuid = $3
+  AND owner = $4;
+
+-- name: GetQRCodeForUpdateTitleAndDesc :one
+SELECT *
+FROM qr_codes
+WHERE uuid = sqlc.arg(UUID)
+  AND owner = sqlc.arg(owner)
+LIMIT 1 FOR NO KEY UPDATE;
