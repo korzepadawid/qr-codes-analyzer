@@ -26,7 +26,7 @@ func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
 		return
 	}
 
-	qrCode, err := h.store.GetQRCode(ctx, uuid)
+	qr, err := h.store.GetQRCode(ctx, uuid)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -37,11 +37,14 @@ func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
 		return
 	}
 
-	h.cacheQRCode(qrCode.Uuid, qrCode.RedirectionUrl)
+	h.cacheWorker <- cacheQRCodeJob{
+		Key:   qr.Uuid,
+		Value: qr.RedirectionUrl,
+	}
 	h.redirectionWorker <- saveRedirectJob{
 		UUID: uuid,
 		IPv4: ctx.ClientIP(),
 	}
 	ctx.Header("Cache-Control", "no-store")
-	ctx.Redirect(http.StatusPermanentRedirect, qrCode.RedirectionUrl)
+	ctx.Redirect(http.StatusPermanentRedirect, qr.RedirectionUrl)
 }

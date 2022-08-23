@@ -43,7 +43,7 @@ func TestRedirectQRCode(t *testing.T) {
 				cache.EXPECT().Set(gomock.Eq(&c.SetParams{
 					Key:      mockSavedQRCode.Uuid,
 					Value:    mockSavedQRCode.RedirectionUrl,
-					Duration: time.Minute * 2,
+					Duration: time.Hour,
 				})).Times(1).Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {

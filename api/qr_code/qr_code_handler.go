@@ -43,11 +43,13 @@ func NewQRCodeHandler(
 		qrCodeEncoder:     qrCodeEncoder,
 		cache:             cache,
 		redirectionWorker: make(chan saveRedirectJob),
+		cacheWorker:       make(chan cacheQRCodeJob),
 	}
 }
 
 func (h qrCodeHandler) RegisterRoutes(r *gin.Engine) {
 	go h.saveRedirectWorker()
+	go h.cacheQRCodesWorker()
 	r.GET(routeRedirect, h.qrCodeRedirect) // the redirect route is publicly accessible
 	r.Use(h.middlewares...)
 	r.POST(routePrefixWithGroup, h.createQRCode)

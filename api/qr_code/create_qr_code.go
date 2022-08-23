@@ -77,7 +77,10 @@ func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {
 		return
 	}
 
-	h.cacheQRCode(QRCode.Uuid, QRCode.RedirectionUrl)
+	h.cacheWorker <- cacheQRCodeJob{
+		Key:   QRCode.Uuid,
+		Value: QRCode.RedirectionUrl,
+	}
 	ctx.JSON(http.StatusCreated, newCreateQRCodeResponse(QRCode))
 }
 
