@@ -2,7 +2,6 @@ package qr_code
 
 import (
 	"context"
-	"github.com/korzepadawid/qr-codes-analyzer/cache"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
 	"log"
@@ -11,10 +10,6 @@ import (
 type saveRedirectJob struct {
 	UUID string
 	IPv4 string
-}
-
-type cacheQRCodeJob struct {
-	cache.SetParams
 }
 
 func (h *qrCodeHandler) saveRedirectWorker() {
