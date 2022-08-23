@@ -42,8 +42,8 @@ func (h *qrCodeHandler) getQRCodes(ctx *gin.Context) {
 			GroupID: groupID,
 			Owner:   owner,
 		}
-		count, err2 := h.store.GetQRCodesCountByGroupAndOwner(ctx, arg)
-		errCh <- err2
+		count, qErr := h.store.GetQRCodesCountByGroupAndOwner(ctx, arg)
+		errCh <- qErr
 		countCh <- count
 	}()
 
@@ -54,8 +54,8 @@ func (h *qrCodeHandler) getQRCodes(ctx *gin.Context) {
 			GroupID: groupID,
 			Owner:   owner,
 		}
-		qrCodes, err2 := h.store.GetQRCodesPageByGroupAndOwner(ctx, arg)
-		errCh <- err2
+		qrCodes, qErr := h.store.GetQRCodesPageByGroupAndOwner(ctx, arg)
+		errCh <- qErr
 		resCh <- qrCodes
 	}()
 
