@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 )
 
@@ -26,6 +27,8 @@ type createQRCodeStabs struct {
 	cache         *mockcache.MockCache
 	encoder       *mockencoder.MockEncoder
 }
+
+var wg sync.WaitGroup
 
 func TestCreateQRCodeAPI(t *testing.T) {
 	testCases := []struct {

@@ -17,12 +17,14 @@ const (
 )
 
 type qrCodeHandler struct {
-	config        config.Config
-	store         db.Store
-	middlewares   []gin.HandlerFunc
-	storage       storage.FileStorage
-	qrCodeEncoder encode.Encoder
-	cache         cache.Cache
+	config            config.Config
+	store             db.Store
+	middlewares       []gin.HandlerFunc
+	storage           storage.FileStorage
+	qrCodeEncoder     encode.Encoder
+	cache             cache.Cache
+	cacheWorker       chan cacheQRCodeJob
+	redirectionWorker chan saveRedirectJob
 }
 
 func NewQRCodeHandler(
@@ -34,16 +36,18 @@ func NewQRCodeHandler(
 	middlewares ...gin.HandlerFunc,
 ) *qrCodeHandler {
 	return &qrCodeHandler{
-		config:        config,
-		store:         store,
-		middlewares:   middlewares,
-		storage:       fileStorage,
-		qrCodeEncoder: qrCodeEncoder,
-		cache:         cache,
+		config:            config,
+		store:             store,
+		middlewares:       middlewares,
+		storage:           fileStorage,
+		qrCodeEncoder:     qrCodeEncoder,
+		cache:             cache,
+		redirectionWorker: make(chan saveRedirectJob),
 	}
 }
 
 func (h qrCodeHandler) RegisterRoutes(r *gin.Engine) {
+	go h.saveRedirectWorker()
 	r.GET(routeRedirect, h.qrCodeRedirect) // the redirect route is publicly accessible
 	r.Use(h.middlewares...)
 	r.POST(routePrefixWithGroup, h.createQRCode)

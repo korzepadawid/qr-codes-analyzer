@@ -3,9 +3,6 @@ package qr_code
 import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
-	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
-	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
-	"log"
 	"net/http"
 )
 
@@ -19,9 +16,11 @@ func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
 	}
 
 	v, err := h.cache.Get(uuid)
-
 	if err == nil {
-		go h.createRedirectEntry(ctx, uuid)
+		h.redirectionWorker <- saveRedirectJob{
+			UUID: uuid,
+			IPv4: ctx.ClientIP(),
+		}
 		ctx.Header("Cache-Control", "no-store")
 		ctx.Redirect(http.StatusPermanentRedirect, v)
 		return
@@ -38,27 +37,11 @@ func (h *qrCodeHandler) qrCodeRedirect(ctx *gin.Context) {
 		return
 	}
 
-	go h.cacheQRCode(qrCode.Uuid, qrCode.RedirectionUrl)
-	go h.createRedirectEntry(ctx, qrCode.Uuid)
-
+	h.cacheQRCode(qrCode.Uuid, qrCode.RedirectionUrl)
+	h.redirectionWorker <- saveRedirectJob{
+		UUID: uuid,
+		IPv4: ctx.ClientIP(),
+	}
 	ctx.Header("Cache-Control", "no-store")
 	ctx.Redirect(http.StatusPermanentRedirect, qrCode.RedirectionUrl)
-}
-
-func (h *qrCodeHandler) createRedirectEntry(ctx *gin.Context, uuid string) {
-	c := ipapi.New()
-	det, err := c.GetIPDetails("142.250.203.206")
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	if err := h.store.IncrementRedirectEntriesTx(ctx, db.IncrementRedirectEntriesTxParams{
-		UUID:      uuid,
-		IPv4:      "142.250.203.206",
-		IPDetails: det,
-	}); err != nil {
-		log.Printf("%v", err)
-	}
 }

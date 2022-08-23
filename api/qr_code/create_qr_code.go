@@ -72,12 +72,12 @@ func (h *qrCodeHandler) createQRCode(ctx *gin.Context) {
 	createQRCodeArgs := h.newCreateQRCodeParams(owner, groupID, request, storageKey, qrCodeUUID)
 	QRCode, err := h.store.CreateQRCode(ctx, createQRCodeArgs)
 	if err != nil {
-		go h.deleteFile(ctx, storageKey)
+		h.deleteFile(ctx, storageKey)
 		ctx.Error(err)
 		return
 	}
 
-	go h.cacheQRCode(QRCode.Uuid, QRCode.RedirectionUrl)
+	h.cacheQRCode(QRCode.Uuid, QRCode.RedirectionUrl)
 	ctx.JSON(http.StatusCreated, newCreateQRCodeResponse(QRCode))
 }
 
