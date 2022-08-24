@@ -27,5 +27,6 @@ go.work
 # env
 *.env
 
-# private ed25519 key
-*ed25519
+# keys
+*private
+*public

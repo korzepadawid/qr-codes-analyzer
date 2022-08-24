@@ -33,7 +33,7 @@ func main() {
 	server, err := api.NewServer(
 		*cfg,
 		db.NewStore(conn),
-		token.NewJWTMaker("fsdfsdf", time.Hour),
+		token.NewJWTMaker(time.Hour),
 		util.NewBCryptHasher(),
 		storage.NewAWSS3FileStorageService(cfg),
 		encode.NewQRCodeEncoder(),

@@ -16,7 +16,7 @@ func TestJWT(t *testing.T) {
 		{
 			description: "should create a new token with valid payload",
 			testCase: func(t *testing.T) {
-				jwtTokenizer := NewJWTMaker(util.RandomString(32), time.Minute)
+				jwtTokenizer := NewJWTMaker(time.Minute)
 				username := util.RandomString(8)
 				token, err := jwtTokenizer.CreateToken(username)
 
@@ -36,7 +36,7 @@ func TestJWT(t *testing.T) {
 		{
 			description: "should return an error when token is expired",
 			testCase: func(t *testing.T) {
-				jwtTokenizer := NewJWTMaker(util.RandomString(32), -time.Second)
+				jwtTokenizer := NewJWTMaker(-time.Second)
 				username := util.RandomString(8)
 				token, err := jwtTokenizer.CreateToken(username)
 
