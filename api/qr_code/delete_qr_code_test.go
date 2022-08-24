@@ -77,7 +77,7 @@ func TestDeleteQRCodeAPI(t *testing.T) {
 			mockFileStorage := mockstorage.NewMockFileStorage(ctrl)
 
 			// stabs
-			r := newMockQRCodeHandler(mockStore, config.Config{}, mockFileStorage, nil, nil, mockTokenProvider)
+			r := newMockQRCodeHandler(mockStore, config.Config{}, mockFileStorage, nil, nil, mockTokenProvider, nil)
 			tC.buildStabs(mockStore, mockTokenProvider, mockFileStorage)
 			recorder := httptest.NewRecorder()
 			request, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("/qr-codes/%s", tC.qrCodeUUID), nil)

@@ -110,7 +110,7 @@ func TestUpdateQRCodeAPI(t *testing.T) {
 			mockTokenProvider := mocktoken.NewMockProvider(ctrl)
 
 			// stabs
-			r := newMockQRCodeHandler(mockStore, config.Config{}, nil, nil, nil, mockTokenProvider)
+			r := newMockQRCodeHandler(mockStore, config.Config{}, nil, nil, nil, mockTokenProvider, nil)
 			tC.buildStabs(mockStore, mockTokenProvider)
 			recorder := httptest.NewRecorder()
 			request, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("/qr-codes/%s", tC.qrCodeUUID), util.MarshallBody(tC.requestBody))

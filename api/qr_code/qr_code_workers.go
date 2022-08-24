@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/korzepadawid/qr-codes-analyzer/cache"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
-	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
 	"log"
 	"time"
 )
@@ -23,8 +22,7 @@ func (h *qrCodeHandler) saveRedirectWorker() {
 	log.Printf("Registered save redirect worker")
 	for job := range h.redirectionWorker {
 		log.Printf("%v", job)
-		c := ipapi.New()
-		det, err := c.GetIPDetails("142.250.203.206")
+		det, err := h.clientIP.GetIPDetails("142.250.203.206")
 
 		if err != nil {
 			log.Println(err)

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/korzepadawid/qr-codes-analyzer/cache"
 	"github.com/korzepadawid/qr-codes-analyzer/encode"
+	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
 	"github.com/korzepadawid/qr-codes-analyzer/util"
@@ -37,6 +38,7 @@ func main() {
 		storage.NewAWSS3FileStorageService(cfg),
 		encode.NewQRCodeEncoder(),
 		cache.NewRedisCache(),
+		ipapi.New(),
 	)
 
 	if err != nil {

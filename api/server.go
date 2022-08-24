@@ -13,6 +13,7 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/config"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/encode"
+	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
 	"github.com/korzepadawid/qr-codes-analyzer/util"
@@ -31,6 +32,7 @@ type Server struct {
 	storage         storage.FileStorage
 	qrCodeEncoder   encode.Encoder
 	cache           cache.Cache
+	clientIP        ipapi.Client
 }
 
 func NewServer(
@@ -41,6 +43,7 @@ func NewServer(
 	storage storage.FileStorage,
 	encoder encode.Encoder,
 	cache cache.Cache,
+	clientIP ipapi.Client,
 ) (*Server, error) {
 	server := Server{
 		Config:          config,
@@ -51,6 +54,7 @@ func NewServer(
 		storage:         storage,
 		cache:           cache,
 		qrCodeEncoder:   encoder,
+		clientIP:        clientIP,
 		Handlers:        make([]common.Handler, 0),
 	}
 
@@ -77,7 +81,7 @@ func NewServer(
 	// route Handlers
 	authHandler := auth.NewAuthHandler(server.Store, server.TokenProvider, server.PasswordService)
 	groupHandler := group.NewGroupHandler(server.Store, auth.SecureRoute(server.TokenProvider))
-	qrCodeHandler := qrcode.NewQRCodeHandler(server.Store, server.Config, server.storage, server.qrCodeEncoder, server.cache, auth.SecureRoute(server.TokenProvider))
+	qrCodeHandler := qrcode.NewQRCodeHandler(server.Store, server.Config, server.storage, server.qrCodeEncoder, server.cache, server.clientIP, auth.SecureRoute(server.TokenProvider))
 
 	server.Handlers = append(server.Handlers, authHandler, groupHandler, qrCodeHandler)
 

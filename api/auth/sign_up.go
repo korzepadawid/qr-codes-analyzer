@@ -40,37 +40,24 @@ func (h *authHandler) signUp(ctx *gin.Context) {
 	}
 
 	hashedPassword, err := h.pass.HashPassword(request.Password)
-
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	user, ok := h.createNewUser(ctx, request, hashedPassword)
-
-	if !ok {
-		return
-	}
-
-	ctx.JSON(http.StatusCreated, mapUserToResponse(user))
-}
-
-func (h *authHandler) createNewUser(ctx *gin.Context, request signUpRequest, hashedPassword string) (db.User, bool) {
 	arg := db.CreateUserParams{
 		Username: request.Username,
 		Password: hashedPassword,
 		Email:    request.Email,
 		FullName: request.FullName,
 	}
-
 	user, err := h.store.CreateUser(ctx, arg)
-
 	if err != nil {
 		ctx.Error(err)
-		return db.User{}, false
+		return
 	}
 
-	return user, true
+	ctx.JSON(http.StatusCreated, mapUserToResponse(user))
 }
 
 func (h *authHandler) checkIfUserExists(ctx *gin.Context, request signUpRequest) bool {

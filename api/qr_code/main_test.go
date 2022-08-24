@@ -10,6 +10,7 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/config"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/encode"
+	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
 	"github.com/korzepadawid/qr-codes-analyzer/util"
@@ -60,11 +61,12 @@ func newMockQRCodeHandler(
 	qrCodeEncoder encode.Encoder,
 	cache cache.Cache,
 	tokenProvider token.Provider,
+	clientIP ipapi.Client,
 ) *gin.Engine {
 	r := gin.Default()
 	common.SetUpErrorHandler(r)
 	r.LoadHTMLGlob("../../templates/*.html")
-	h := NewQRCodeHandler(store, config, fileStorage, qrCodeEncoder, cache, auth.SecureRoute(tokenProvider))
+	h := NewQRCodeHandler(store, config, fileStorage, qrCodeEncoder, cache, clientIP, auth.SecureRoute(tokenProvider))
 	h.RegisterRoutes(r)
 	return r
 }

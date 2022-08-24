@@ -10,6 +10,8 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/config"
 	mockdb "github.com/korzepadawid/qr-codes-analyzer/db/mock"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
+	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
+	mockipapi "github.com/korzepadawid/qr-codes-analyzer/ipapi/mock"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -21,14 +23,16 @@ func TestRedirectQRCode(t *testing.T) {
 	testCases := []struct {
 		description   string
 		qrCodeUUID    string
-		buildStabs    func(store *mockdb.MockStore, cache *mockcache.MockCache)
+		buildStabs    func(store *mockdb.MockStore, cache *mockcache.MockCache, client *mockipapi.MockClient)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			description: "should redirect when using url from cache",
 			qrCodeUUID:  mockSavedQRCode.Uuid,
-			buildStabs: func(_ *mockdb.MockStore, cache *mockcache.MockCache) {
+			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache, client *mockipapi.MockClient) {
 				cache.EXPECT().Get(gomock.Eq(mockSavedQRCode.Uuid)).Times(1).Return(mockSavedQRCode.StorageUrl, nil)
+				client.EXPECT().GetIPDetails(gomock.Any()).Times(1).Return(&ipapi.IPDetails{}, nil)
+				store.EXPECT().IncrementRedirectEntriesTx(gomock.Any(), gomock.Any()).Times(1).Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusPermanentRedirect, recorder.Code)
@@ -37,7 +41,7 @@ func TestRedirectQRCode(t *testing.T) {
 		{
 			description: "should cache url and redirect when using db instead of cache",
 			qrCodeUUID:  mockSavedQRCode.Uuid,
-			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache) {
+			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache, client *mockipapi.MockClient) {
 				cache.EXPECT().Get(gomock.Eq(mockSavedQRCode.Uuid)).Times(1).Return("", redis.Nil)
 				store.EXPECT().GetQRCode(gomock.Any(), gomock.Eq(mockSavedQRCode.Uuid)).Times(1).Return(mockSavedQRCode, nil)
 				cache.EXPECT().Set(gomock.Eq(&c.SetParams{
@@ -45,6 +49,8 @@ func TestRedirectQRCode(t *testing.T) {
 					Value:    mockSavedQRCode.RedirectionUrl,
 					Duration: time.Hour,
 				})).Times(1).Return(nil)
+				client.EXPECT().GetIPDetails(gomock.Any()).Times(1).Return(&ipapi.IPDetails{}, nil)
+				store.EXPECT().IncrementRedirectEntriesTx(gomock.Any(), gomock.Any()).Times(1).Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusPermanentRedirect, recorder.Code)
@@ -53,7 +59,7 @@ func TestRedirectQRCode(t *testing.T) {
 		{
 			description: "should return an error when url not found either in cache or db",
 			qrCodeUUID:  mockSavedQRCode.Uuid,
-			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache) {
+			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache, client *mockipapi.MockClient) {
 				cache.EXPECT().Get(gomock.Eq(mockSavedQRCode.Uuid)).Times(1).Return("", redis.Nil)
 				store.EXPECT().GetQRCode(gomock.Any(), gomock.Eq(mockSavedQRCode.Uuid)).Times(1).Return(db.QrCode{}, sql.ErrNoRows)
 			},
@@ -64,7 +70,7 @@ func TestRedirectQRCode(t *testing.T) {
 		{
 			description: "should return an error when db failed to query",
 			qrCodeUUID:  mockSavedQRCode.Uuid,
-			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache) {
+			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache, client *mockipapi.MockClient) {
 				cache.EXPECT().Get(gomock.Eq(mockSavedQRCode.Uuid)).Times(1).Return("", redis.Nil)
 				store.EXPECT().GetQRCode(gomock.Any(), gomock.Eq(mockSavedQRCode.Uuid)).Times(1).Return(db.QrCode{}, sql.ErrConnDone)
 			},
@@ -75,7 +81,7 @@ func TestRedirectQRCode(t *testing.T) {
 		{
 			description: "should return an error when empty uuid",
 			qrCodeUUID:  "",
-			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache) {
+			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache, client *mockipapi.MockClient) {
 				cache.EXPECT().Get(gomock.Eq("")).Times(0)
 				store.EXPECT().GetQRCode(gomock.Any(), gomock.Eq("")).Times(0)
 			},
@@ -86,7 +92,7 @@ func TestRedirectQRCode(t *testing.T) {
 		{
 			description: "should return an error when trimmed uuid is empty)",
 			qrCodeUUID:  "       ",
-			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache) {
+			buildStabs: func(store *mockdb.MockStore, cache *mockcache.MockCache, client *mockipapi.MockClient) {
 				cache.EXPECT().Get(gomock.Eq("")).Times(0)
 				store.EXPECT().GetQRCode(gomock.Any(), gomock.Eq("")).Times(0)
 			},
@@ -102,10 +108,10 @@ func TestRedirectQRCode(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			mockStore := mockdb.NewMockStore(ctrl)
 			mockCache := mockcache.NewMockCache(ctrl)
-
+			mockClientIP := mockipapi.NewMockClient(ctrl)
 			// stabs
-			r := newMockQRCodeHandler(mockStore, config.Config{}, nil, nil, mockCache, nil)
-			tC.buildStabs(mockStore, mockCache)
+			r := newMockQRCodeHandler(mockStore, config.Config{}, nil, nil, mockCache, nil, mockClientIP)
+			tC.buildStabs(mockStore, mockCache, mockClientIP)
 			recorder := httptest.NewRecorder()
 			request, err := http.NewRequest(
 				http.MethodGet,

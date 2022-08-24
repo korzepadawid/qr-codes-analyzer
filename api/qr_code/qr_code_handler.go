@@ -6,6 +6,7 @@ import (
 	"github.com/korzepadawid/qr-codes-analyzer/config"
 	db "github.com/korzepadawid/qr-codes-analyzer/db/sqlc"
 	"github.com/korzepadawid/qr-codes-analyzer/encode"
+	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 )
 
@@ -23,6 +24,7 @@ type qrCodeHandler struct {
 	storage           storage.FileStorage
 	qrCodeEncoder     encode.Encoder
 	cache             cache.Cache
+	clientIP          ipapi.Client
 	cacheWorker       chan cacheQRCodeJob
 	redirectionWorker chan saveRedirectJob
 }
@@ -33,6 +35,7 @@ func NewQRCodeHandler(
 	fileStorage storage.FileStorage,
 	qrCodeEncoder encode.Encoder,
 	cache cache.Cache,
+	clientIP ipapi.Client,
 	middlewares ...gin.HandlerFunc,
 ) *qrCodeHandler {
 	return &qrCodeHandler{
@@ -42,6 +45,7 @@ func NewQRCodeHandler(
 		storage:           fileStorage,
 		qrCodeEncoder:     qrCodeEncoder,
 		cache:             cache,
+		clientIP:          clientIP,
 		redirectionWorker: make(chan saveRedirectJob),
 		cacheWorker:       make(chan cacheQRCodeJob),
 	}
