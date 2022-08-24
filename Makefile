@@ -33,3 +33,6 @@ mock-storage:
 
 mock-encoder:
 	mockgen --build_flags=--mod=mod -package mockencoder -destination encode/mock/encoder.go github.com/korzepadawid/qr-codes-analyzer/encode Encoder
+
+rsa:
+	./gen-rsa.sh
