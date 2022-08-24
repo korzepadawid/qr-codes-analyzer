@@ -16,6 +16,8 @@ type Config struct {
 	AWSBucketName   string `mapstructure:"AWS_BUCKET_NAME"`
 	AWSBucketRegion string `mapstructure:"AWS_BUCKET_REGION"`
 	CDNAddress      string `mapstructure:"CDN_ADDRESS"`
+	RedisAddr       string `mapstructure:"REDIS_ADDR"`
+	RedisPass       string `mapstructure:"REDIS_PASS"`
 	AppURL          string `mapstructure:"APP_URL"`
 }
 
