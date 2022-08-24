@@ -19,6 +19,7 @@ type Config struct {
 	RedisAddr       string `mapstructure:"REDIS_ADDR"`
 	RedisPass       string `mapstructure:"REDIS_PASS"`
 	AppURL          string `mapstructure:"APP_URL"`
+	LocalstackURL   string `mapstructure:"LOCALSTACK_URL"`
 }
 
 func Load(path string) (*Config, error) {

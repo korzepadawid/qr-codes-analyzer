@@ -8,6 +8,7 @@ RUN go build -o main main.go
 FROM alpine:3.14
 WORKDIR /app
 RUN mkdir -p token/keys
+COPY app.env .
 COPY --from=builder /app/token/keys/* ./token/keys
 COPY --from=builder /app/main .
 EXPOSE 8080
