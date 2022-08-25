@@ -9,7 +9,6 @@ const (
 )
 
 type Config struct {
-	DBDriver        string `mapstructure:"DB_DRIVER"`
 	DBSource        string `mapstructure:"DB_SOURCE"`
 	Addr            string `mapstructure:"ADDR"`
 	Env             string `mapstructure:"ENV"`

@@ -25,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	conn, err := sql.Open(cfg.DBDriver, cfg.DBSource)
+	conn, err := sql.Open("postgres", cfg.DBSource)
 
 	if err != nil {
 		log.Fatal(err)
