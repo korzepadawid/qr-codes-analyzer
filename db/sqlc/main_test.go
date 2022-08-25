@@ -2,11 +2,12 @@ package db
 
 import (
 	"database/sql"
-	"github.com/korzepadawid/qr-codes-analyzer/config"
-	_ "github.com/lib/pq"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/korzepadawid/qr-codes-analyzer/config"
+	_ "github.com/lib/pq"
 )
 
 var testDB *sql.DB
@@ -20,7 +21,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	testDB, err = sql.Open(cfg.DBDriver, cfg.DBSource)
+	testDB, err = sql.Open("postgres", cfg.DBSource)
 
 	if err != nil {
 		log.Fatal(err)

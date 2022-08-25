@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	localcfg "github.com/korzepadawid/qr-codes-analyzer/config"
-	"log"
 )
 
 var (
@@ -30,7 +31,7 @@ func NewAWSS3FileStorageService(c *localcfg.Config) *AWSS3FileStorage {
 	cfg, err := config.LoadDefaultConfig(ctx)
 
 	if c.Env == localcfg.EnvDev || c.Env == localcfg.EnvTest {
-		cfg, err = setUpTestOrDevEnv(cfg, err, ctx)
+		cfg, err = setUpTestOrDevEnv(ctx, cfg, err, c)
 	}
 
 	if err != nil {
@@ -87,11 +88,11 @@ func bucketExists(ctx context.Context, s3Client *s3.Client, bucketName *string) 
 	return ErrBucketDoesNotExist
 }
 
-func setUpTestOrDevEnv(cfg aws.Config, err error, ctx context.Context) (aws.Config, error) {
+func setUpTestOrDevEnv(ctx context.Context, cfg aws.Config, err error, lcfg *localcfg.Config) (aws.Config, error) {
 	customResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
 		if service == s3.ServiceID {
 			return aws.Endpoint{
-				URL:               "http://localhost:4566", // using s3 from localstack locally https://github.com/localstack/localstack
+				URL:               lcfg.LocalstackURL, // localstack
 				HostnameImmutable: true,
 			}, nil
 		}

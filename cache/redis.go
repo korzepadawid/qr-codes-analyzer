@@ -2,18 +2,20 @@ package cache
 
 import (
 	"context"
+
 	"github.com/go-redis/redis/v9"
+	"github.com/korzepadawid/qr-codes-analyzer/config"
 )
 
 type redisCache struct {
 	client *redis.Client
 }
 
-func NewRedisCache() *redisCache {
+func NewRedisCache(config *config.Config) *redisCache {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     config.RedisAddr,
+		Password: config.RedisPass,
+		DB:       0,
 	})
 
 	return &redisCache{

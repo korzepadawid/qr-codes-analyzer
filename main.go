@@ -2,14 +2,15 @@ package main
 
 import (
 	"database/sql"
+	"log"
+	"time"
+
 	"github.com/korzepadawid/qr-codes-analyzer/cache"
 	"github.com/korzepadawid/qr-codes-analyzer/encode"
 	"github.com/korzepadawid/qr-codes-analyzer/ipapi"
 	"github.com/korzepadawid/qr-codes-analyzer/storage"
 	"github.com/korzepadawid/qr-codes-analyzer/token"
 	"github.com/korzepadawid/qr-codes-analyzer/util"
-	"log"
-	"time"
 
 	"github.com/korzepadawid/qr-codes-analyzer/api"
 	"github.com/korzepadawid/qr-codes-analyzer/config"
@@ -24,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	conn, err := sql.Open(cfg.DBDriver, cfg.DBSource)
+	conn, err := sql.Open("postgres", cfg.DBSource)
 
 	if err != nil {
 		log.Fatal(err)
@@ -37,7 +38,7 @@ func main() {
 		util.NewBCryptHasher(),
 		storage.NewAWSS3FileStorageService(cfg),
 		encode.NewQRCodeEncoder(),
-		cache.NewRedisCache(),
+		cache.NewRedisCache(cfg),
 		ipapi.New(),
 	)
 
