@@ -11,7 +11,6 @@ FROM alpine:3.14
 WORKDIR /app
 RUN mkdir -p token/keys
 RUN mkdir templates
-COPY app.env .
 COPY start.sh .
 COPY wait-for.sh .
 COPY db/migrations ./migration
