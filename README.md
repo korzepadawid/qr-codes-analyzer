@@ -29,7 +29,7 @@ This is a REST API for analyzing the popularity of your QR codes, developed with
 ## How does it work?
 The application works like a proxy for QR codes.
 After scanning the QR code, the user is getting redirected to the `/qr-codes/:uuid/redirect` endpoint. The application redirects the end-user to the redirection URL and saves redirection details to the database in parallel.
-[![how-does-it-work](https://i.im.ge/2022/09/14/1XuOvy.Diagram-bez-tytulu-drawio.png)](https://im.ge/i/1XuOvy)
+[![how-does-it-work](https://i.ibb.co/2s2yVHF/Diagram-bez-tytu-u-drawio.png)](https://i.ibb.co/2s2yVHF/Diagram-bez-tytu-u-drawio.png)
 
 - Users can create accounts and sign in with either email or username.
 
