@@ -45,5 +45,5 @@ uuid,title,url,ipv4,isp,as,city,country,lat,lon,date
 ```
 - Detailed data about an IPv4 come from the external  API (https://ip-api.com/).
 
-## Database scheme
-[![db-scheme](https://i.ibb.co/6Bwx0wR/Bez-tytu-u.png)
+## Database schema
+![db-scheme](https://i.ibb.co/6Bwx0wR/Bez-tytu-u.png)
