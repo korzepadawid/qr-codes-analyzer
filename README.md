@@ -46,4 +46,4 @@ uuid,title,url,ipv4,isp,as,city,country,lat,lon,date
 - Detailed data about an IPv4 come from the external  API (https://ip-api.com/).
 
 ## Database scheme
-[![db-scheme](https://i.im.ge/2022/09/14/1X1RQq.Beztytulu.png)](https://im.ge/i/1X1RQq)
+[![db-scheme](https://i.ibb.co/6Bwx0wR/Bez-tytu-u.png)
